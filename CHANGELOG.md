@@ -6,11 +6,16 @@
 - Display PDF bill in modal when customer requests bill ("Pedir Cuenta")
 - PDF generated server-side using QuestPDF with professional layout
 - Shows items, quantities, prices, subtotal, tax (18%), and total
-- "Ver Cuenta" button triggers PDF modal display
+- PDF now in ticket/receipt format (~80mm width) for thermal printers
 
 ### Fixed - Time Display in Tabs Modal
 - TabsModal now shows only time (hh:mm) instead of full datetime string
 - Format: "Abierta hh:mm · X ítems"
+
+### Fixed - Prevent Double Bill Requests
+- "Pedir Cuenta" button is disabled after clicking
+- Button text changes to "Cuenta Solicitada" with gray styling
+- Prevents error when clicking button multiple times
 
 ---
 
