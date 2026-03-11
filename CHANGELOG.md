@@ -22,6 +22,12 @@
 - Button text changes to "Cuenta Solicitada" with gray styling
 - Prevents error when clicking button multiple times
 
+### Added - Cancel Items from Tab
+- Add remove button (X) to each item in TabDetailModal
+- Click removes item from order and updates totals
+- Cancelled items hidden in PDF receipt
+- Cancelled items excluded from kitchen/bar displays
+
 ---
 
 ## [1.2.1] - 2026-03-11
