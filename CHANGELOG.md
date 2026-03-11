@@ -1,5 +1,29 @@
 # Changelog - BOHUCO POS Frontend
 
+## [1.3.0] - 2026-03-11
+
+### Added - PDF Bill Generation
+- Display PDF bill in modal when customer requests bill ("Pedir Cuenta")
+- PDF generated server-side using QuestPDF with professional layout
+- Shows items, quantities, prices, subtotal, tax (18%), and total
+- PDF now in ticket/receipt format (~80mm width) for thermal printers
+
+### Added - PDF Destination Display
+- PDF now shows item destination (Kitchen/Bar) below each item
+- Modern thermal ticket design with Theme colors
+- ContinuousSize for dynamic height (like real thermal roll)
+
+### Fixed - Time Display in Tabs Modal
+- TabsModal now shows only time (hh:mm) instead of full datetime string
+- Format: "Abierta hh:mm · X ítems"
+
+### Fixed - Prevent Double Bill Requests
+- "Pedir Cuenta" button is disabled after clicking
+- Button text changes to "Cuenta Solicitada" with gray styling
+- Prevents error when clicking button multiple times
+
+---
+
 ## [1.2.1] - 2026-03-11
 
 ### Added - Item Destination (Kitchen/Bar)

@@ -22,7 +22,7 @@ function TabRow({ tab, onView }: { tab: Tab; onView: () => void }) {
         <div>
           <div className={styles.customerName}>{tab.customerName}</div>
           <div className={styles.tabMeta}>
-            Abierta {tab.openedAt} · {itemCount} ítem{itemCount !== 1 ? 's' : ''}
+            Abierta {tab.openedAt ? new Date(tab.openedAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''} · {itemCount} ítem{itemCount !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
