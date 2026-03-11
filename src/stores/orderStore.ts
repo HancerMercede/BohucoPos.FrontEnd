@@ -207,8 +207,6 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
         }),
       });
 
-      console.log('Order response:', response.status, response.statusText);
-
       if (response.ok) {
         const orderId = await response.json();
         
@@ -286,15 +284,12 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     };
     const statusNumber = typeof status === 'number' ? status : (statusMap[status] ?? 0);
     
-    console.log('Updating item:', itemId, 'status:', status, '->', statusNumber);
-    
     try {
       const response = await fetch(`${API_URL}/api/orders/items/${itemId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Status: statusNumber }),
       });
-      console.log('Response:', response.status);
       
       if (response.ok) {
         set((state) => ({
