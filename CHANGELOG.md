@@ -8,6 +8,11 @@
 - Shows items, quantities, prices, subtotal, tax (18%), and total
 - PDF now in ticket/receipt format (~80mm width) for thermal printers
 
+### Added - PDF Destination Display
+- PDF now shows item destination (Kitchen/Bar) below each item
+- Modern thermal ticket design with Theme colors
+- ContinuousSize for dynamic height (like real thermal roll)
+
 ### Fixed - Time Display in Tabs Modal
 - TabsModal now shows only time (hh:mm) instead of full datetime string
 - Format: "Abierta hh:mm · X ítems"
