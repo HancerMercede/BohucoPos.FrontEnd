@@ -29,6 +29,14 @@ const mapTabStatus = (status: number | string): string => {
   return status;
 };
 
+const mapOrderItems = (items: any[]): any[] => {
+  return items.map((i: any) => ({
+    ...i,
+    status: mapStatus(i.status),
+    dest: i.destination === 'Bar' || i.destination === 1 ? 'Bar' : (i.destination === 'Kitchen' || i.destination === 0 ? 'Kitchen' : i.dest || 'Kitchen'),
+  }));
+};
+
 const getTableDisplayName = (tableId: string | null): string => {
   if (!tableId) return 'Sin mesa';
   const table = defaultTables.find(t => t.id === tableId);
@@ -340,10 +348,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
           orders: (t.orders || []).map((o: any) => ({
             ...o,
             status: mapStatus(o.status),
-            items: (o.items || []).map((i: any) => {
-              const dest = i.destination === 1 ? 'Bar' : (i.destination === 0 ? 'Kitchen' : i.dest || 'Kitchen');
-              return { ...i, status: mapStatus(i.status), dest };
-            }),
+            items: mapOrderItems(o.items || []),
           })),
         }));
         set({ tabs: mappedTabs });
@@ -374,10 +379,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
           orders: (tab.orders || []).map((o: any) => ({
             ...o,
             status: mapStatus(o.status),
-            items: (o.items || []).map((i: any) => ({
-              ...i,
-              status: mapStatus(i.status),
-            })),
+            items: mapOrderItems(o.items || []),
           })),
         };
         set({ selectedTab: mappedTab });
