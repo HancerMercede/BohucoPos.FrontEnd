@@ -7,6 +7,8 @@
 - Backend now accepts destination from frontend (0=Kitchen, 1=Bar)
 - Fixed item destination mapping in TabDetailModal
 - Uses lowercase "destination" to match backend response
+- Fix item destination mapping to handle both string ('Bar', 'Kitchen') and number (0, 1) formats from backend
+- Create mapOrderItems helper to reuse mapping logic across fetchTabsByLocation and fetchTabDetails
 
 ### Fixed - Tab System Integration Issues
 
