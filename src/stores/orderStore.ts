@@ -1,0 +1,483 @@
+import { create } from 'zustand';
+import * as signalR from '@microsoft/signalr';
+import type { TableItem, CartItem, Order, MenuItem, MenuCategory, ItemDestination, Tab, PaymentMethod } from '../types';
+
+const API_URL = 'https://localhost:7089';
+const SIGNALR_URL = 'https://localhost:7089/hubs/orders';
+
+const STATUS_MAP: Record<number, string> = {
+  0: 'Pending',
+  1: 'Preparing',
+  2: 'Ready',
+  3: 'Delivered',
+};
+
+const TAB_STATUS_MAP: Record<number, string> = {
+  0: 'Open',
+  1: 'Pending',
+  2: 'Closed',
+  3: 'Cancelled',
+};
+
+const mapStatus = (status: number | string): string => {
+  if (typeof status === 'number') return STATUS_MAP[status] || 'Pending';
+  return status;
+};
+
+const mapTabStatus = (status: number | string): string => {
+  if (typeof status === 'number') return TAB_STATUS_MAP[status] || 'Open';
+  return status;
+};
+
+const getTableDisplayName = (tableId: string | null): string => {
+  if (!tableId) return 'Sin mesa';
+  const table = defaultTables.find(t => t.id === tableId);
+  return table?.name || tableId;
+};
+
+const defaultTables: TableItem[] = [
+  { id: 't1', name: 'Mesa 1', status: 'free' },
+  { id: 't2', name: 'Mesa 2', status: 'occupied' },
+  { id: 't3', name: 'Mesa 3', status: 'occupied' },
+  { id: 't4', name: 'Mesa 4', status: 'occupied' },
+  { id: 't5', name: 'Mesa 5', status: 'free' },
+  { id: 't6', name: 'Mesa 6', status: 'free' },
+  { id: 't7', name: 'Mesa 7', status: 'occupied' },
+  { id: 't8', name: 'Mesa 8', status: 'free' },
+  { id: 'b1', name: 'Barra 1', status: 'free', type: 'bar' },
+  { id: 'b2', name: 'Barra 2', status: 'occupied', type: 'bar' },
+];
+
+const menuItems: MenuItem[] = [
+  { id: 'p1', name: 'Pollo a la Brasa', price: 12.5, dest: 'Kitchen', category: 'Platos', emoji: '🍗' },
+  { id: 'p2', name: 'Pasta Carbonara', price: 11.0, dest: 'Kitchen', category: 'Platos', emoji: '🍝' },
+  { id: 'p3', name: 'Pizza Margarita', price: 10.5, dest: 'Kitchen', category: 'Platos', emoji: '🍕' },
+  { id: 'p4', name: 'Ensalada César', price: 8.0, dest: 'Kitchen', category: 'Entradas', emoji: '🥗' },
+  { id: 'p5', name: 'Nachos', price: 7.5, dest: 'Kitchen', category: 'Entradas', emoji: '🧀' },
+  { id: 'p6', name: 'Burger Clásica', price: 13.0, dest: 'Kitchen', category: 'Platos', emoji: '🍔' },
+  { id: 'p7', name: 'Mojito', price: 9.0, dest: 'Bar', category: 'Bebidas', emoji: '🍹' },
+  { id: 'p8', name: 'Negroni', price: 11.0, dest: 'Bar', category: 'Bebidas', emoji: '🍸' },
+  { id: 'p9', name: 'Vino Tinto', price: 8.5, dest: 'Bar', category: 'Bebidas', emoji: '🍷' },
+  { id: 'p10', name: 'Cerveza Artesanal', price: 6.5, dest: 'Bar', category: 'Bebidas', emoji: '🍺' },
+  { id: 'p11', name: 'Coca-Cola', price: 3.0, dest: 'Bar', category: 'Bebidas', emoji: '🥤' },
+  { id: 'p12', name: 'Papas Fritas', price: 5.0, dest: 'Kitchen', category: 'Entradas', emoji: '🍟' },
+];
+
+interface OrderStore {
+  tables: TableItem[];
+  cart: CartItem[];
+  orders: Order[];
+  selectedTable: TableItem | null;
+  waiterStep: 'tables' | 'menu' | 'tabs';
+  category: MenuCategory;
+  sent: boolean;
+  isLoading: boolean;
+  
+  tabs: Tab[];
+  selectedTab: Tab | null;
+  
+  selectTable: (table: TableItem) => void;
+  addToCart: (item: MenuItem) => void;
+  updateCartQty: (id: string, delta: number) => void;
+  updateCartNote: (id: string, notes: string) => void;
+  removeFromCart: (id: string) => void;
+  clearCart: () => void;
+  setCategory: (cat: MenuCategory) => void;
+  submitOrder: (waiterName: string) => Promise<void>;
+  fetchPendingOrders: (dest: ItemDestination, clearFirst?: boolean) => Promise<void>;
+  updateOrderItemStatus: (orderId: string, itemId: number, status: string) => Promise<void>;
+  clearOrders: () => void;
+  loadSignalR: () => void;
+  
+  fetchTabsByLocation: (location: string) => Promise<void>;
+  fetchTabDetails: (tabId: number) => Promise<void>;
+  openTab: (location: string, customerName: string, waiterId: string, waiterName: string) => Promise<number>;
+  requestBill: (tabId: number) => Promise<void>;
+  closeTab: (tabId: number, paymentMethod: PaymentMethod, directClose?: boolean) => Promise<void>;
+  cancelTab: (tabId: number, reason?: string) => Promise<void>;
+  setSelectedTab: (tab: Tab | null) => void;
+  goToTabs: (table: TableItem) => void;
+  goBackToTables: () => void;
+}
+
+export const useOrderStore = create<OrderStore>((set, get) => ({
+  tables: defaultTables,
+  cart: [],
+  orders: [],
+  selectedTable: null,
+  waiterStep: 'tables',
+  category: 'Todos',
+  sent: false,
+  isLoading: false,
+  
+  tabs: [],
+  selectedTab: null,
+
+  selectTable: (table) => {
+    const { tabs } = get();
+    const tableTabs = tabs.filter(t => t.location === table.name && t.status !== 'Closed' && t.status !== 'Cancelled');
+    
+    if (tableTabs.length > 0) {
+      set({ selectedTable: table, waiterStep: 'tabs', tabs: tableTabs });
+    } else {
+      set({ selectedTable: table, waiterStep: 'menu', cart: [] });
+    }
+  },
+  
+  goToTabs: (table) => {
+    set({ selectedTable: table, waiterStep: 'tabs' });
+  },
+  
+  goBackToTables: () => set({ selectedTable: null, waiterStep: 'tables', selectedTab: null }),
+  
+  setSelectedTab: (tab) => set({ selectedTab: tab }),
+  
+  addToCart: (item) => {
+    const { cart } = get();
+    const existing = cart.find(c => c.id === item.id);
+    if (existing) {
+      set({ cart: cart.map(c => c.id === item.id ? { ...c, qty: c.qty + 1 } : c) });
+    } else {
+      set({ cart: [...cart, { ...item, qty: 1, notes: '' }] });
+    }
+  },
+
+  updateCartQty: (id, delta) => {
+    set((state) => ({
+      cart: state.cart.map(c => {
+        if (c.id === id) {
+          const newQty = c.qty + delta;
+          return newQty > 0 ? { ...c, qty: newQty } : c;
+        }
+        return c;
+      }).filter(c => c.qty > 0)
+    }));
+  },
+
+  updateCartNote: (id, notes) => {
+    set((state) => ({
+      cart: state.cart.map(c => c.id === id ? { ...c, notes } : c)
+    }));
+  },
+
+  removeFromCart: (id) => {
+    set((state) => ({ cart: state.cart.filter(c => c.id !== id) }));
+  },
+
+  clearCart: () => set({ cart: [], sent: false, selectedTable: null, waiterStep: 'tables' }),
+
+  setCategory: (cat) => set({ category: cat }),
+
+  submitOrder: async (waiterName) => {
+    const { cart, selectedTable, selectedTab } = get();
+    if (cart.length === 0) return;
+
+    const orderType = selectedTable?.type === 'bar' ? 1 : 0;
+
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderType,
+          tableId: selectedTable?.id || null,
+          waiterName,
+          items: cart.map(item => ({
+            productId: item.id,
+            productName: item.name,
+            unitPrice: item.price,
+            quantity: item.qty,
+            notes: item.notes || null,
+          })),
+        }),
+      });
+
+      console.log('Order response:', response.status, response.statusText);
+
+      if (response.ok) {
+        const orderId = await response.json();
+        
+        if (selectedTab && selectedTable) {
+          await fetch(`${API_URL}/api/tabs/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ TabId: selectedTab.id, OrderId: orderId }),
+          });
+          
+          get().fetchTabsByLocation(selectedTable.name);
+        }
+        
+        set({ sent: true });
+        setTimeout(() => {
+          set({ cart: [], sent: false, selectedTable: null, waiterStep: 'tables', selectedTab: null });
+        }, 2300);
+      } else {
+        const errorText = await response.text();
+        console.error('Order error:', errorText);
+      }
+    } catch (error) {
+      console.error('Failed to submit order:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchPendingOrders: async (dest, clearFirst = false) => {
+    set({ isLoading: true});
+    try {
+      const destination = dest === 'Kitchen' ? 0 : 1;
+      const response = await fetch(`${API_URL}/api/orders/pending/${destination}`);
+      if (response.ok) {
+        const orders = await response.json();
+        const mappedOrders = orders.map((o: any) => ({
+          ...o,
+          idDisplay: o.idDisplay || `ORD-${String(o.id).padStart(3, '0')}`,
+          table: getTableDisplayName(o.tableId),
+          waiter: o.waiterName,
+          status: mapStatus(o.status),
+          items: (o.items || []).map((item: any) => ({
+            ...item,
+            dest: item.destination === 0 ? 'Kitchen' : 'Bar',
+            name: item.productName,
+            qty: item.quantity,
+            status: mapStatus(item.status),
+          })),
+        }));
+        
+        set((state) => {
+          if (clearFirst) {
+            return { orders: mappedOrders };
+          }
+          const existingIds = new Set(state.orders.map(o => o.id));
+          const newOrders = mappedOrders.filter((o: any) => !existingIds.has(o.id));
+          return { orders: [...state.orders, ...newOrders] };
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  
+  clearOrders: () => set({ orders: [] }),
+
+  updateOrderItemStatus: async (orderId, itemId, status) => {
+    const statusMap: Record<string, number> = {
+      'Pending': 0,
+      'Preparing': 1,
+      'Ready': 2,
+      'Delivered': 3,
+    };
+    const statusNumber = typeof status === 'number' ? status : (statusMap[status] ?? 0);
+    
+    console.log('Updating item:', itemId, 'status:', status, '->', statusNumber);
+    
+    try {
+      const response = await fetch(`${API_URL}/api/orders/items/${itemId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Status: statusNumber }),
+      });
+      console.log('Response:', response.status);
+      
+      if (response.ok) {
+        set((state) => ({
+          orders: state.orders.map(order => 
+            order.id === Number(orderId) 
+              ? { ...order, items: order.items.map(item => item.id === itemId ? { ...item, status: status as any } : item) }
+              : order
+          ),
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  },
+
+  loadSignalR: () => {
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(SIGNALR_URL)
+      .withAutomaticReconnect()
+      .build();
+
+    connection.on('OrderCreated', (order: Order) => {
+      set((state) => {
+        const existing = state.orders.find(o => o.id === order.id);
+        if (existing) {
+          return { orders: state.orders.map(o => o.id === order.id ? order : o) };
+        }
+        return { orders: [...state.orders, order] };
+      });
+    });
+
+    connection.on('OrderUpdated', (order: Order) => {
+      set((state) => ({
+        orders: state.orders.map(o => o.id === order.id ? order : o),
+      }));
+    });
+
+    connection.start().catch(console.error);
+  },
+
+  fetchTabsByLocation: async (location) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/tabs/location/${encodeURIComponent(location)}`);
+      if (response.ok) {
+        const tabs = await response.json();
+        const mappedTabs = tabs.map((t: any) => ({
+          ...t,
+          status: mapTabStatus(t.status),
+          orders: (t.orders || []).map((o: any) => ({
+            ...o,
+            status: mapStatus(o.status),
+            items: (o.items || []).map((i: any) => ({
+              ...i,
+              status: mapStatus(i.status),
+            })),
+          })),
+        }));
+        set({ tabs: mappedTabs });
+        
+        const tablesWithTabs = new Set(mappedTabs.map((t: Tab) => t.location));
+        set((state) => ({
+          tables: state.tables.map(t => 
+            tablesWithTabs.has(t.name) ? { ...t, status: 'has-tabs' as const } : t
+          ),
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch tabs:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchTabDetails: async (tabId) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/tabs/${tabId}`);
+      if (response.ok) {
+        const tab = await response.json();
+        const mappedTab = {
+          ...tab,
+          status: mapTabStatus(tab.status),
+          orders: (tab.orders || []).map((o: any) => ({
+            ...o,
+            status: mapStatus(o.status),
+            items: (o.items || []).map((i: any) => ({
+              ...i,
+              status: mapStatus(i.status),
+            })),
+          })),
+        };
+        set({ selectedTab: mappedTab });
+      }
+    } catch (error) {
+      console.error('Failed to fetch tab details:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  openTab: async (location, customerName, waiterId, waiterName) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/tabs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          location,
+          customerName,
+          waiterId,
+          waiterName,
+          taxRate: 0.18,
+        }),
+      });
+
+      if (response.ok) {
+        const tabId = await response.json();
+        await get().fetchTabsByLocation(location);
+        return tabId;
+      }
+      throw new Error('Failed to open tab');
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  requestBill: async (tabId) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/tabs/${tabId}/request-bill`, {
+        method: 'POST',
+      });
+      
+      if (response.ok) {
+        const { selectedTable } = get();
+        if (selectedTable) {
+          await get().fetchTabsByLocation(selectedTable.name);
+          await get().fetchTabDetails(tabId);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to request bill:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  closeTab: async (tabId, paymentMethod, directClose = false) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/tabs/${tabId}/close`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentMethod,
+          directClose,
+        }),
+      });
+      
+      if (response.ok) {
+        const { selectedTable } = get();
+        if (selectedTable) {
+          await get().fetchTabsByLocation(selectedTable.name);
+        }
+        set({ selectedTab: null, waiterStep: 'tables', selectedTable: null });
+      }
+    } catch (error) {
+      console.error('Failed to close tab:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  cancelTab: async (tabId, reason) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/tabs/${tabId}/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+      
+      if (response.ok) {
+        const { selectedTable } = get();
+        if (selectedTable) {
+          await get().fetchTabsByLocation(selectedTable.name);
+        }
+        set({ selectedTab: null });
+      }
+    } catch (error) {
+      console.error('Failed to cancel tab:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+}));
+
+export const useMenuItems = () => menuItems;
+export { defaultTables };

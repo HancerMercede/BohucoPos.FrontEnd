@@ -1,0 +1,47 @@
+:root {
+  /* Fonts */
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'Fira Code', monospace;
+
+  /* Glass surfaces */
+  --glass-card:    rgba(255,255,255, 0.09);
+  --glass-hover:   rgba(255,255,255, 0.13);
+  --glass-mid:     rgba(255,255,255, 0.15);
+  --glass-strong:  rgba(255,255,255, 0.20);
+  --nav-bg:        rgba(10,15,30,    0.70);
+  --cart-bg:       rgba(255,255,255, 0.07);
+  --modal-bg:      rgba(14,20,46,    0.95);
+  --tab-container: rgba(0,0,0,       0.25);
+
+  /* Borders */
+  --border-subtle:  rgba(255,255,255, 0.10);
+  --border-default: rgba(255,255,255, 0.15);
+  --border-mid:     rgba(255,255,255, 0.18);
+  --border-strong:  rgba(255,255,255, 0.28);
+  --border-active:  rgba(255,255,255, 0.32);
+
+  /* Text */
+  --text-primary:  rgba(255,255,255, 0.90);
+  --text-second:   rgba(255,255,255, 0.86);
+  --text-mid:      rgba(255,255,255, 0.60);
+  --text-muted:    rgba(255,255,255, 0.42);
+  --text-dim:      rgba(255,255,255, 0.38);
+  --text-disabled: rgba(255,255,255, 0.28);
+
+  /* Accents */
+  --blue:   #3B82F6;
+  --purple: #8B5CF6;
+  --green:  #10B981;
+  --orange: #F97316;
+  --red:    #EF4444;
+  --slate:  #64748B;
+
+  /* Border radius */
+  --radius-pill:   99px;
+  --radius-card:   20px;
+  --radius-menu:   16px;
+  --radius-btn:    12px;
+  --radius-action: 10px;
+  --radius-tag:    6px;
+}

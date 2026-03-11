@@ -1,0 +1,161 @@
+/* ── Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;600&display=swap');
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg,#0a0f1e 0%,#14082e 40%,#071a30 70%,#0a0f1e 100%);
+  min-height: 100vh;
+  color: rgba(255,255,255,0.90);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 99px; }
+
+/* ── Animations ── */
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%     { opacity:.5; transform:scale(1.5); }
+}
+
+@keyframes float-in {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+@keyframes success-pop {
+  0%   { transform:scale(0.7); opacity:0; }
+  60%  { transform:scale(1.1); }
+  100% { transform:scale(1);   opacity:1; }
+}
+
+/* ── Global Classes ── */
+.nb {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: 11px;
+  padding: 7px 17px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,.50);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .18s;
+}
+
+.nb:hover {
+  background: rgba(255,255,255,.09);
+  color: rgba(255,255,255,.85);
+}
+
+.nb.on {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+.pill {
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 99px;
+  padding: 5px 15px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,.60);
+  cursor: pointer;
+  transition: all .18s;
+}
+
+.pill:hover,
+.pill.on {
+  background: rgba(255,255,255,.20);
+  color: #fff;
+  border-color: rgba(255,255,255,.32);
+}
+
+.mi {
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all .20s;
+  animation: float-in .35s ease both;
+}
+
+.mi:hover {
+  background: rgba(255,255,255,.13);
+  border-color: rgba(255,255,255,.28);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 32px rgba(0,0,0,.28);
+}
+
+.mi.sel {
+  border-color: rgba(59,130,246,.55);
+  box-shadow: 0 0 0 1px rgba(59,130,246,.22), 0 8px 24px rgba(59,130,246,.16);
+}
+
+.oc {
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all .22s;
+  animation: float-in .4s ease both;
+}
+
+.oc.urgent {
+  border-color: rgba(239,68,68,.50);
+  box-shadow: 0 0 0 1px rgba(239,68,68,.14), 0 8px 32px rgba(239,68,68,.12);
+}
+
+.oc.done {
+  border-color: rgba(16,185,129,.42);
+  box-shadow: 0 0 0 1px rgba(16,185,129,.10), 0 8px 24px rgba(16,185,129,.10);
+}
+
+.tb {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 16px;
+  padding: 20px 12px;
+  cursor: pointer;
+  transition: all .20s;
+  text-align: center;
+  animation: float-in .3s ease both;
+}
+
+.tb.free:hover {
+  background: rgba(59,130,246,.18);
+  border-color: rgba(59,130,246,.48);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(59,130,246,.22);
+}
+
+.tb.occ {
+  opacity: .40;
+  cursor: not-allowed;
+}
+
+.abtn {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 0;
+  width: 100%;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s;
+  letter-spacing: .3px;
+}

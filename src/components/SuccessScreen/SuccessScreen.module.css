@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.icon {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: rgba(16,185,129,.20);
+  border: 2px solid rgba(16,185,129,.50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  color: #10B981;
+  animation: success-pop 0.5s ease both;
+  box-shadow: 0 0 48px rgba(16,185,129,.32);
+}

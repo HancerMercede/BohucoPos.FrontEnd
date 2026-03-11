@@ -1,0 +1,132 @@
+.container {
+  padding: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.headerIcon {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.activeCount {
+  margin-left: auto;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 12px;
+  padding: 7px 17px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 16px;
+}
+
+.cardHeader {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.09);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardTime {
+  text-align: right;
+}
+
+.cardBody {
+  padding: 14px;
+}
+
+.itemCard {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px;
+  padding: 10px 13px;
+  margin-bottom: 9px;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerTitle {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.headerSubtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.38);
+  margin: 0;
+}
+
+.activeCountValue {
+  font-family: 'Fira Code', monospace;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.activeCountLabel {
+  font-size: 12px;
+  color: rgba(255,255,255,0.42);
+}
+
+.cardTitle {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.cardMeta {
+  font-size: 11px;
+  color: rgba(255,255,255,0.38);
+  margin-top: 2px;
+}
+
+.cardTimeValue {
+  font-family: 'Fira Code', monospace;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.cardTimeLabel {
+  font-size: 10px;
+  color: rgba(255,255,255,0.32);
+}
+
+.itemText {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.86);
+}
+
+.itemNotes {
+  font-size: 11px;
+  color: rgba(255,255,255,0.36);
+  font-style: italic;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}

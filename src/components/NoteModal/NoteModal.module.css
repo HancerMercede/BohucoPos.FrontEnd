@@ -1,0 +1,68 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 300;
+}
+
+.modal {
+  background: var(--modal-bg);
+  border: 1px solid var(--border-mid);
+  border-radius: 22px;
+  padding: 28px;
+  width: 305px;
+  box-shadow: 0 36px 80px rgba(0,0,0,.55);
+}
+
+.input {
+  width: 100%;
+  height: 86px;
+  padding: 10px 13px;
+  resize: none;
+  background: rgba(255,255,255,.09);
+  border: 1px solid var(--border-mid);
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: rgba(255,255,255,.32);
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.cancelBtn {
+  flex: 1;
+  padding: 9px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid var(--border-default);
+  border-radius: 10px;
+  cursor: pointer;
+  color: rgba(255,255,255,.68);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+}
+
+.saveBtn {
+  flex: 1;
+  padding: 9px;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #fff;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
