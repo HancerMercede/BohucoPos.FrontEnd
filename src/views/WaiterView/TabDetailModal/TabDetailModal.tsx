@@ -36,7 +36,7 @@ function OrderBlock({ order, index }: { order: Order; index: number }) {
   )
 }
 
-export function TabDetailModal({ tab, table: _table, onClose, onAddOrder, onRequestBill, onCloseTab }: TabDetailModalProps) {
+export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill, onCloseTab }: TabDetailModalProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [pdfLoading, setPdfLoading] = useState(false)
   
@@ -87,7 +87,7 @@ export function TabDetailModal({ tab, table: _table, onClose, onAddOrder, onRequ
             <div>
               <h3 className={styles.title}>{tab.customerName}</h3>
               <p className={styles.subtitle}>
-                Abierto {tab.openedAt ? new Date(tab.openedAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''}
+                {table.name} · Abierta {tab.openedAt ? new Date(tab.openedAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''}
               </p>
             </div>
           </div>
