@@ -51,8 +51,8 @@
 .grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 14px;
-  max-width: 720px;
+  gap: 18px;
+  max-width: 900px;
 }
 
 .card {
@@ -61,8 +61,8 @@
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 16px;
-  padding: 20px 12px;
+  border-radius: 20px;
+  padding: 28px 16px;
   cursor: pointer;
   transition: all 0.20s ease;
   font-family: 'Outfit', sans-serif;
@@ -71,7 +71,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  min-height: 120px;
 }
 
 .free:hover {
@@ -121,14 +122,14 @@
 
 .tabCount {
   position: absolute;
-  top: 8px;
-  left: 10px;
-  width: 18px;
-  height: 18px;
+  top: 10px;
+  left: 12px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: rgba(59, 130, 246, 0.90);
   color: #fff;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
@@ -137,20 +138,20 @@
 }
 
 .icon {
-  font-size: 26px;
-  margin-bottom: 4px;
+  font-size: 36px;
+  margin-bottom: 6px;
 }
 
 .name {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.88);
 }
 
 .statusLabel {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .label_free     { color: rgba(16, 185, 129, 0.90); }

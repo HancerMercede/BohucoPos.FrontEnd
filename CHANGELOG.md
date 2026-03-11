@@ -10,6 +10,9 @@
 - Fix item destination mapping to handle both string ('Bar', 'Kitchen') and number (0, 1) formats from backend
 - Create mapOrderItems helper to reuse mapping logic across fetchTabsByLocation and fetchTabDetails
 
+### UI Improvements
+- Increase table/bar cards size for better visibility and distinction
+
 ### Fixed - Tab System Integration Issues
 
 - **Tab Entity ID Auto-Increment**: Fixed duplicate key error when opening tabs
