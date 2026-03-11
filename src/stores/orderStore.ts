@@ -10,6 +10,7 @@ const STATUS_MAP: Record<number, string> = {
   1: 'Preparing',
   2: 'Ready',
   3: 'Delivered',
+  4: 'Cancelled',
 };
 
 const TAB_STATUS_MAP: Record<number, string> = {
@@ -104,6 +105,7 @@ interface OrderStore {
   closeTab: (tabId: number, paymentMethod: PaymentMethod, directClose?: boolean) => Promise<void>;
   cancelTab: (tabId: number, reason?: string) => Promise<void>;
   fetchBillPdf: (tabId: number) => Promise<string>;
+  cancelItem: (itemId: number, reason?: string) => Promise<void>;
   setSelectedTab: (tab: Tab | null) => void;
   goToTabs: (table: TableItem) => void;
   goToMenu: (table: TableItem) => void;
@@ -510,6 +512,30 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     if (!response.ok) throw new Error('Failed to fetch PDF');
     const blob = await response.blob();
     return URL.createObjectURL(blob);
+  },
+
+  cancelItem: async (itemId: number, reason?: string) => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/orders/items/${itemId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+      
+      if (response.ok) {
+        const { selectedTab, selectedTable } = get();
+        if (selectedTab) {
+          await get().fetchTabDetails(selectedTab.id);
+        } else if (selectedTable) {
+          await get().fetchTabsByLocation(selectedTable.name);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to cancel item:', error);
+    } finally {
+      set({ isLoading: false });
+    }
   },
 }));
 

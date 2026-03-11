@@ -2,7 +2,7 @@
 
 export type OrderType      = 'Table' | 'Bar' | 'TakeAway' | 'Delivery'
 export type OrderStatus    = 'Pending' | 'InProgress' | 'Ready' | 'Delivered' | 'Cancelled'
-export type ItemStatus     = 'Pending' | 'Preparing' | 'Ready' | 'Delivered'
+export type ItemStatus     = 'Pending' | 'Preparing' | 'Ready' | 'Delivered' | 'Cancelled'
 export type ItemDestination= 'Kitchen' | 'Bar'
 export type TableStatus    = 'free' | 'occupied' | 'pending' | 'has-tabs'
 export type TableType      = 'table' | 'bar'

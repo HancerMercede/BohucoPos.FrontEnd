@@ -2,13 +2,27 @@ import type { TabDetailModalProps, Order, OrderItem } from '../../../types'
 import { TAB_STATUS_COLORS, TAX_RATE } from '../../../constants/design'
 import { DestTag } from '../../../components/DestTag'
 import { useState } from 'react'
+import { useOrderStore } from '../../../stores/orderStore'
 import styles from './TabDetailModal.module.css'
 
 function OrderBlock({ order, index }: { order: Order; index: number }) {
-  const orderTotal = order.items.reduce((sum, i) => sum + (i.price || i.unitPrice || 0) * (i.qty || i.quantity || 0), 0)
+  const cancelItem = useOrderStore(s => s.cancelItem)
+  const [cancelling, setCancelling] = useState<number | null>(null)
+  
+  const activeItems = order.items.filter((i: OrderItem) => i.status !== 'Cancelled')
+  const orderTotal = activeItems.reduce((sum, i) => sum + (i.price || i.unitPrice || 0) * (i.qty || i.quantity || 0), 0)
   
   const orderId = order.idDisplay || order.idDisplay || `ORD-${order.id}`
   const orderTime = order.createdAt ? new Date(order.createdAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''
+
+  const handleRemoveItem = async (itemId: number) => {
+    setCancelling(itemId)
+    try {
+      await cancelItem(itemId)
+    } finally {
+      setCancelling(null)
+    }
+  }
 
   return (
     <div className={styles.orderBlock} style={{ animationDelay: `${index * 0.06}s` }}>
@@ -18,19 +32,31 @@ function OrderBlock({ order, index }: { order: Order; index: number }) {
         <span className={styles.orderSubtotal}>${orderTotal.toFixed(2)}</span>
       </div>
       <div className={styles.itemsList}>
-        {order.items.map((item: OrderItem) => (
-          <div key={item.id} className={styles.itemRow}>
-            <span className={styles.itemQty}>×{item.qty || item.quantity}</span>
-            <span className={styles.itemName}>{item.name || item.productName}</span>
-            <DestTag dest={item.dest || 'Kitchen'} />
-            {item.notes && (
-              <span className={styles.itemNote}>📝 {item.notes}</span>
-            )}
-            <span className={styles.itemPrice}>
-              ${(((item.price || item.unitPrice || 0) * (item.qty || item.quantity || 0))).toFixed(2)}
-            </span>
-          </div>
-        ))}
+        {order.items.map((item: OrderItem) => {
+          if (item.status === 'Cancelled') return null
+          
+          return (
+            <div key={item.id} className={styles.itemRow}>
+              <span className={styles.itemQty}>×{item.qty || item.quantity}</span>
+              <span className={styles.itemName}>{item.name || item.productName}</span>
+              <DestTag dest={item.dest || 'Kitchen'} />
+              {item.notes && (
+                <span className={styles.itemNote}>📝 {item.notes}</span>
+              )}
+              <button 
+                className={styles.removeBtn}
+                onClick={() => handleRemoveItem(item.id)}
+                disabled={cancelling === item.id}
+                title="Eliminar item"
+              >
+                {cancelling === item.id ? '...' : '✕'}
+              </button>
+              <span className={styles.itemPrice}>
+                ${(((item.price || item.unitPrice || 0) * (item.qty || item.quantity || 0))).toFixed(2)}
+              </span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
