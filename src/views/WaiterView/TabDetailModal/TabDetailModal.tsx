@@ -39,6 +39,7 @@ function OrderBlock({ order, index }: { order: Order; index: number }) {
 export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill, onCloseTab }: TabDetailModalProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [billRequested, setBillRequested] = useState(false)
   
   const s = TAB_STATUS_COLORS[tab.status]
   const subtotal = tab.orders.reduce(
@@ -50,6 +51,9 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
   const isPending = tab.status === 'PENDING' || tab.status === 'Pending'
 
   const handleRequestBill = async () => {
+    if (billRequested) return
+    
+    setBillRequested(true)
     if (onRequestBill) {
       await onRequestBill()
     }
@@ -138,10 +142,11 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
               </button>
               <button
                 className={styles.btnRequestBill}
-                style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
+                style={{ background: billRequested ? 'linear-gradient(135deg,#9CA3AF,#6B7280)' : 'linear-gradient(135deg,#F97316,#EA580C)', cursor: billRequested ? 'not-allowed' : 'pointer' }}
                 onClick={handleRequestBill}
+                disabled={billRequested}
               >
-                Pedir Cuenta
+                {billRequested ? 'Cuenta Solicitada' : 'Pedir Cuenta'}
               </button>
               <button
                 className={styles.btnClose}
