@@ -37,15 +37,15 @@ const getTableDisplayName = (tableId: string | null): string => {
 
 const defaultTables: TableItem[] = [
   { id: 't1', name: 'Mesa 1', status: 'free' },
-  { id: 't2', name: 'Mesa 2', status: 'occupied' },
-  { id: 't3', name: 'Mesa 3', status: 'occupied' },
-  { id: 't4', name: 'Mesa 4', status: 'occupied' },
+  { id: 't2', name: 'Mesa 2', status: 'free' },
+  { id: 't3', name: 'Mesa 3', status: 'free' },
+  { id: 't4', name: 'Mesa 4', status: 'free' },
   { id: 't5', name: 'Mesa 5', status: 'free' },
   { id: 't6', name: 'Mesa 6', status: 'free' },
-  { id: 't7', name: 'Mesa 7', status: 'occupied' },
+  { id: 't7', name: 'Mesa 7', status: 'free' },
   { id: 't8', name: 'Mesa 8', status: 'free' },
   { id: 'b1', name: 'Barra 1', status: 'free', type: 'bar' },
-  { id: 'b2', name: 'Barra 2', status: 'occupied', type: 'bar' },
+  { id: 'b2', name: 'Barra 2', status: 'free', type: 'bar' },
 ];
 
 const menuItems: MenuItem[] = [
@@ -97,6 +97,7 @@ interface OrderStore {
   cancelTab: (tabId: number, reason?: string) => Promise<void>;
   setSelectedTab: (tab: Tab | null) => void;
   goToTabs: (table: TableItem) => void;
+  goToMenu: (table: TableItem) => void;
   goBackToTables: () => void;
 }
 
@@ -118,9 +119,9 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     const tableTabs = tabs.filter(t => t.location === table.name && t.status !== 'Closed' && t.status !== 'Cancelled');
     
     if (tableTabs.length > 0) {
-      set({ selectedTable: table, waiterStep: 'tabs', tabs: tableTabs });
+      set({ selectedTable: table, tabs: tableTabs });
     } else {
-      set({ selectedTable: table, waiterStep: 'menu', cart: [] });
+      set({ selectedTable: table, cart: [] });
     }
   },
   
@@ -128,7 +129,11 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     set({ selectedTable: table, waiterStep: 'tabs' });
   },
   
-  goBackToTables: () => set({ selectedTable: null, waiterStep: 'tables', selectedTab: null }),
+  goToMenu: (table) => {
+    set({ selectedTable: table, waiterStep: 'menu', cart: [] });
+  },
+  
+  goBackToTables: () => set({ selectedTable: null, waiterStep: 'tables', selectedTab: null, cart: [] }),
   
   setSelectedTab: (tab) => set({ selectedTab: tab }),
   
@@ -189,6 +194,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
             unitPrice: item.price,
             quantity: item.qty,
             notes: item.notes || null,
+            destination: item.dest || 'Kitchen',
           })),
         }),
       });
@@ -324,7 +330,8 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   fetchTabsByLocation: async (location) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(`${API_URL}/api/tabs/location/${encodeURIComponent(location)}`);
+      const endpoint = location ? `/api/tabs/location/${encodeURIComponent(location)}` : '/api/tabs/active';
+      const response = await fetch(`${API_URL}${endpoint}`);
       if (response.ok) {
         const tabs = await response.json();
         const mappedTabs = tabs.map((t: any) => ({
@@ -336,6 +343,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
             items: (o.items || []).map((i: any) => ({
               ...i,
               status: mapStatus(i.status),
+              dest: i.Destination || i.destination || i.dest || 'Kitchen',
             })),
           })),
         }));
@@ -344,7 +352,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
         const tablesWithTabs = new Set(mappedTabs.map((t: Tab) => t.location));
         set((state) => ({
           tables: state.tables.map(t => 
-            tablesWithTabs.has(t.name) ? { ...t, status: 'has-tabs' as const } : t
+            tablesWithTabs.has(t.name) ? { ...t, status: 'occupied' as const } : t
           ),
         }));
       }
@@ -399,7 +407,13 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
 
       if (response.ok) {
         const tabId = await response.json();
-        await get().fetchTabsByLocation(location);
+        await get().fetchTabsByLocation('');
+        
+        const newTab = get().tabs.find(t => t.id === tabId);
+        if (newTab) {
+          set({ selectedTab: newTab });
+        }
+        
         return tabId;
       }
       throw new Error('Failed to open tab');
@@ -431,22 +445,41 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
 
   closeTab: async (tabId, paymentMethod, directClose = false) => {
     set({ isLoading: true });
+    console.log('Closing tab:', tabId, 'payment:', paymentMethod);
+    
+    const paymentMap: Record<string, number> = { Cash: 0, Card: 1, Transfer: 2 };
+    const paymentValue = paymentMap[paymentMethod] ?? 1;
+    
     try {
       const response = await fetch(`${API_URL}/api/tabs/${tabId}/close`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          paymentMethod,
+          paymentMethod: paymentValue,
           directClose,
         }),
       });
       
+      console.log('Close response:', response.status, response.statusText);
+      
       if (response.ok) {
         const { selectedTable } = get();
-        if (selectedTable) {
-          await get().fetchTabsByLocation(selectedTable.name);
+        const tableName = selectedTable?.name;
+        
+        await get().fetchTabsByLocation('');
+        
+        if (tableName) {
+          const currentTabs = get().tabs.filter(t => t.location === tableName && t.status !== 'Closed' && t.status !== 'Cancelled');
+          if (currentTabs.length === 0) {
+            set((state) => ({
+              tables: state.tables.map(t =>
+                t.name === tableName ? { ...t, status: 'free' as const } : t
+              ),
+            }));
+          }
         }
-        set({ selectedTab: null, waiterStep: 'tables', selectedTable: null });
+        
+        set({ selectedTab: null, waiterStep: 'tables', selectedTable: null, cart: [] });
       }
     } catch (error) {
       console.error('Failed to close tab:', error);

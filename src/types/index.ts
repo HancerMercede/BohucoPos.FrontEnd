@@ -1,44 +1,28 @@
-// ─── ENUMS ───────────────────────────────────────────────────────
+// ─── ENUMS / UNION TYPES ─────────────────────────────────────────
 
-export type OrderType = 'Table' | 'Bar' | 'TakeAway' | 'Delivery'
+export type OrderType      = 'Table' | 'Bar' | 'TakeAway' | 'Delivery'
+export type OrderStatus    = 'Pending' | 'InProgress' | 'Ready' | 'Delivered' | 'Cancelled'
+export type ItemStatus     = 'Pending' | 'Preparing' | 'Ready' | 'Delivered'
+export type ItemDestination= 'Kitchen' | 'Bar'
+export type TableStatus    = 'free' | 'occupied' | 'pending' | 'has-tabs'
+export type TableType      = 'table' | 'bar'
+export type ViewId         = 'waiter' | 'kitchen' | 'bar' | 'overview'
+export type WaiterStep     = 'tables' | 'menu' | 'tabs'
+export type MenuCategory   = 'Todos' | 'Platos' | 'Entradas' | 'Bebidas'
+export type TabStatus      = 'OPEN' | 'PENDING' | 'CLOSED' | 'CANCELLED' | 'Open' | 'Pending' | 'Closed' | 'Cancelled'
+export type PaymentMethod  = 'CASH' | 'CARD' | 'TRANSFER' | 'Cash' | 'Card' | 'Transfer'
 
-export type OrderStatus =
-  | 'Pending'
-  | 'InProgress'
-  | 'Ready'
-  | 'Delivered'
-  | 'Cancelled'
-
-export type ItemStatus =
-  | 'Pending'
-  | 'Preparing'
-  | 'Ready'
-  | 'Delivered'
-
-export type ItemDestination = 'Kitchen' | 'Bar'
-
-export type TableStatus = 'free' | 'occupied' | 'has-tabs'
-
-export type ViewId = 'waiter' | 'kitchen' | 'bar' | 'overview'
-
-export type WaiterStep = 'tables' | 'menu' | 'tabs'
-
-export type MenuCategory = 'Todos' | 'Platos' | 'Entradas' | 'Bebidas'
-
-export type TabStatus = 'Open' | 'Pending' | 'Closed' | 'Cancelled'
-
-export type PaymentMethod = 'Cash' | 'Card' | 'Transfer'
-
-// ─── ENTITIES ────────────────────────────────────────────────────
+// ─── CORE ENTITIES ───────────────────────────────────────────────
 
 export interface OrderItem {
   id: number
   orderId?: number
   productId?: string
-  productName: string
+  productName?: string
   name?: string
   unitPrice?: number
-  quantity: number
+  price?: number
+  quantity?: number
   qty?: number
   notes: string
   destination?: ItemDestination
@@ -47,17 +31,43 @@ export interface OrderItem {
 }
 
 export interface Order {
-  id: number
+  id: number | string
   idDisplay?: string
-  orderType?: OrderType
-  type?: OrderType
-  status: OrderStatus
-  tableId?: string | null
+  tabId?: string
   table?: string
   waiterName?: string
   waiter?: string
+  tableId?: string | null
+  orderType?: OrderType
+  type?: OrderType
+  status: OrderStatus
   createdAt: string
   items: OrderItem[]
+}
+
+export interface Tab {
+  id: number
+  idDisplay?: string
+  location: string
+  customerName: string
+  waiterId: string
+  waiterName?: string
+  status: TabStatus
+  openedAt: string
+  closedAt?: string
+  orders: Order[]
+  paymentMethod?: PaymentMethod
+  notes?: string
+  subtotal?: number
+  tax?: number
+  total?: number
+}
+
+export interface TableItem {
+  id: string
+  name: string
+  status: TableStatus
+  type?: TableType
 }
 
 export interface MenuItem {
@@ -69,43 +79,19 @@ export interface MenuItem {
   emoji: string
 }
 
-export interface TableItem {
-  id: string
-  name: string
-  status: TableStatus
-  type?: 'bar'
-}
-
-export interface Tab {
-  id: number
-  idDisplay: string
-  location: string
-  customerName: string
-  waiterName: string
-  status: TabStatus
-  openedAt: string
-  closedAt?: string
-  paymentMethod?: PaymentMethod
-  subtotal: number
-  tax: number
-  total: number
-  notes?: string
-  orders: Order[]
-}
-
-// ─── CART ────────────────────────────────────────────────────────
-
 export interface CartItem extends MenuItem {
   qty: number
   notes: string
 }
 
-// ─── DESIGN SYSTEM ────────────────────────────────────────────────
+// ─── COMPUTED / UI HELPERS ─────────────────────────────────────────
 
 export interface StatusStyle {
+  label?: string
+  color?: string
   bg: string
   border: string
-  text: string
+  text?: string
 }
 
 export interface StatCardData {
@@ -119,7 +105,7 @@ export interface StatCardData {
 // ─── COMPONENT PROPS ─────────────────────────────────────────────
 
 export interface BadgeProps {
-  status: ItemStatus | OrderStatus
+  status: ItemStatus | OrderStatus | TabStatus
 }
 
 export interface DestTagProps {
@@ -131,26 +117,34 @@ export interface TopBarProps {
   setView: (view: ViewId) => void
 }
 
-export interface DisplayViewProps {
-  dest: ItemDestination
+export interface TableSelectorProps {
+  tables: TableItem[]
+  tabsByTable: Record<string, Tab[]>
+  onSelectFree: (table: TableItem) => void
+  onSelectOccupied: (table: TableItem) => void
 }
 
-export interface OrderCardProps {
-  order: Order
-  dest: ItemDestination
-  onUpdateStatus: (orderId: string, itemId: number, newStatus: ItemStatus) => void
+export interface OpenTabModalProps {
+  table: TableItem
+  onConfirm: (customerName: string) => void
+  onClose: () => void
 }
 
-export interface ItemRowProps {
-  item: OrderItem
-  accentGrad: string
-  accentGlow: string
-  onUpdateStatus: (itemId: number, newStatus: ItemStatus) => void
+export interface TabsModalProps {
+  table: TableItem
+  tabs: Tab[]
+  onViewTab: (tab: Tab) => void
+  onNewTab: () => void
+  onClose: () => void
 }
 
-export interface StatCardProps {
-  data: StatCardData
-  animationDelay: number
+export interface TabDetailModalProps {
+  tab: Tab
+  table: TableItem
+  onClose: () => void
+  onAddOrder: () => void
+  onRequestBill?: () => void
+  onCloseTab?: (paymentMethod: PaymentMethod) => void
 }
 
 export interface NoteModalProps {
@@ -160,26 +154,6 @@ export interface NoteModalProps {
   onClose: () => void
 }
 
-export interface TableSelectorProps {
-  tables: TableItem[]
-  onSelect: (table: TableItem) => void
-}
-
-export interface MenuPanelProps {
-  selectedTable: TableItem
-  items: MenuItem[]
-  cart: CartItem[]
-  onAdd: (item: MenuItem) => void
-  onBack: () => void
-  activeCategory: MenuCategory
-  onCategoryChange: (cat: MenuCategory) => void
-}
-
-export interface CartSidebarProps {
-  cart: CartItem[]
-  selectedTable: TableItem
-  onAdd: (item: MenuItem) => void
-  onRemove: (itemId: string) => void
-  onAddNote: (itemId: string, note: string) => void
-  onSend: () => void
+export interface DisplayViewProps {
+  dest: ItemDestination
 }

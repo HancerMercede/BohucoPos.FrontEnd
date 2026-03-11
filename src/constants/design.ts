@@ -6,11 +6,13 @@ export const FONTS = {
   mono:    "'Fira Code', monospace",
 } as const
 
+export const TAX_RATE = 0.18
+
 export const STATUS_COLORS: Record<string, StatusStyle> = {
-  pending:   { bg:'rgba(249,115,22,0.15)',  border:'rgba(249,115,22,0.40)',  text:'#F97316' },
-  preparing: { bg:'rgba(59,130,246,0.15)',  border:'rgba(59,130,246,0.40)',  text:'#3B82F6' },
-  ready:     { bg:'rgba(16,185,129,0.15)',  border:'rgba(16,185,129,0.40)',  text:'#10B981' },
-  delivered: { bg:'rgba(148,163,184,0.15)', border:'rgba(148,163,184,0.30)', text:'#94A3B8' },
+  pending:   { label:'Pendiente',  color:'#F97316', bg:'rgba(249,115,22,0.15)',  border:'rgba(249,115,22,0.40)',  text:'#F97316' },
+  preparing: { label:'Preparando', color:'#3B82F6', bg:'rgba(59,130,246,0.15)',  border:'rgba(59,130,246,0.40)',  text:'#3B82F6' },
+  ready:     { label:'Listo ✓',   color:'#10B981', bg:'rgba(16,185,129,0.15)',  border:'rgba(16,185,129,0.40)',  text:'#10B981' },
+  delivered: { label:'Entregado',  color:'#94A3B8', bg:'rgba(148,163,184,0.15)', border:'rgba(148,163,184,0.30)', text:'#94A3B8' },
 }
 
 export const STATUS_LABELS: Record<string, string> = {
@@ -20,6 +22,17 @@ export const STATUS_LABELS: Record<string, string> = {
   Delivered: 'Entregado',
 }
 
+export const TAB_STATUS_COLORS: Record<string, StatusStyle> = {
+  OPEN:      { label:'Abierta',   color:'#10B981', bg:'rgba(16,185,129,0.15)',  border:'rgba(16,185,129,0.40)'  },
+  PENDING:   { label:'Cuenta',    color:'#F97316', bg:'rgba(249,115,22,0.15)',  border:'rgba(249,115,22,0.40)'  },
+  CLOSED:    { label:'Cerrada',   color:'#94A3B8', bg:'rgba(148,163,184,0.15)', border:'rgba(148,163,184,0.30)' },
+  CANCELLED: { label:'Cancelada', color:'#EF4444', bg:'rgba(239,68,68,0.15)',   border:'rgba(239,68,68,0.40)'   },
+  Open:      { label:'Abierta',   color:'#10B981', bg:'rgba(16,185,129,0.15)',  border:'rgba(16,185,129,0.40)'  },
+  Pending:   { label:'Cuenta',    color:'#F97316', bg:'rgba(249,115,22,0.15)',  border:'rgba(249,115,22,0.40)'  },
+  Closed:    { label:'Cerrada',   color:'#94A3B8', bg:'rgba(148,163,184,0.15)', border:'rgba(148,163,184,0.30)' },
+  Cancelled: { label:'Cancelada', color:'#EF4444', bg:'rgba(239,68,68,0.15)',   border:'rgba(239,68,68,0.40)'   },
+}
+
 export const ACTION_LABELS: Record<string, string> = {
   Pending:   '▶ Iniciar',
   Preparing: '✓ Listo',
@@ -27,16 +40,24 @@ export const ACTION_LABELS: Record<string, string> = {
 }
 
 export const ACTION_GRADIENTS: Record<string, string> = {
-  Pending:   'linear-gradient(135deg,#3B82F6,#6366F1)',
-  Preparing_Kitchen: 'linear-gradient(135deg,#10B981,#059669)',
-  Preparing_Bar:     'linear-gradient(135deg,#8B5CF6,#6366F1)',
-  Ready:     'linear-gradient(135deg,#64748B,#475569)',
+  primary:   'linear-gradient(135deg, #3B82F6, #8B5CF6)',
+  kitchen:   'linear-gradient(135deg, #10B981, #059669)',
+  bar:       'linear-gradient(135deg, #8B5CF6, #6366F1)',
+  danger:    'linear-gradient(135deg, #EF4444, #DC2626)',
+  pending:   'linear-gradient(135deg, #F97316, #EA580C)',
+  slate:     'linear-gradient(135deg, #64748B, #475569)',
 }
 
 export const NEXT_STATUS: Partial<Record<string, string>> = {
   Pending:   'Preparing',
   Preparing: 'Ready',
   Ready:     'Delivered',
+}
+
+export const PAYMENT_LABELS: Record<string, string> = {
+  CASH:     '💵 Efectivo',
+  CARD:     '💳 Tarjeta',
+  TRANSFER: '📲 Transferencia',
 }
 
 export const DISPLAY_CONFIG = {

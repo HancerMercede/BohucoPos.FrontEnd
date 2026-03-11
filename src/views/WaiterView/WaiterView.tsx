@@ -1,11 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useOrderStore } from '../../stores/orderStore';
 import { DestTag } from '../../components/DestTag';
-import { OpenTabModal } from '../../components/OpenTabModal';
-import { TabList } from '../../components/TabList';
-import { TabDetail } from '../../components/TabDetail';
+import { TableSelector } from './TableSelector';
+import { OpenTabModal } from './OpenTabModal';
+import { TabsModal } from './TabsModal';
+import { TabDetailModal } from './TabDetailModal';
 import styles from './WaiterView.module.css';
-import type { MenuCategory, TableItem, PaymentMethod } from '../../types';
+import type { MenuCategory, Tab, PaymentMethod } from '../../types';
 
 const categories: MenuCategory[] = ['Todos', 'Platos', 'Entradas', 'Bebidas'];
 
@@ -33,6 +34,8 @@ const menuItemsData: MenuItem[] = [
   { id: 'p12', name: 'Papas Fritas', price: 5.0, dest: 'Kitchen', category: 'Entradas', emoji: '🍟' },
 ];
 
+type ModalType = 'openTab' | 'tabsList' | 'tabDetail' | null;
+
 export function WaiterView() {
   const {
     tables,
@@ -45,24 +48,34 @@ export function WaiterView() {
     tabs,
     selectedTab,
     selectTable,
+    goToMenu,
+    goBackToTables,
     addToCart,
     updateCartQty,
     updateCartNote,
     setCategory,
     submitOrder,
     fetchTabsByLocation,
-    fetchTabDetails,
     openTab,
     requestBill,
     closeTab,
-    cancelTab,
     setSelectedTab,
-    goToTabs,
-    goBackToTables,
   } = useOrderStore();
 
   const [noteModal, setNoteModal] = useState<{ id: string; note: string } | null>(null);
-  const [openTabModal, setOpenTabModal] = useState(false);
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
+
+  const tabsByTable = useMemo(() => {
+    const result: Record<string, Tab[]> = {};
+    tabs.forEach(tab => {
+      const tableId = tables.find(t => t.name === tab.location)?.id;
+      if (tableId) {
+        if (!result[tableId]) result[tableId] = [];
+        result[tableId].push(tab);
+      }
+    });
+    return result;
+  }, [tabs, tables]);
 
   const filteredItems = useMemo(() => {
     return category === 'Todos' ? menuItemsData : menuItemsData.filter(m => m.category === category);
@@ -76,27 +89,28 @@ export function WaiterView() {
 
   const handleOpenTab = async (customerName: string) => {
     if (selectedTable) {
-      await openTab(selectedTable.name, customerName, 'waiter-1', 'Mesero');
-      setOpenTabModal(false);
+      await openTab(selectedTable.name, customerName || 'Cliente', 'waiter-1', 'Mesero');
+      setActiveModal(null);
+      goToMenu(selectedTable);
     }
   };
 
-  const handleSelectTab = async (tab: typeof tabs[0]) => {
-    setSelectedTab(tab);
-    await fetchTabDetails(tab.id);
+  const handleCloseTab = async (paymentMethod: PaymentMethod) => {
+    if (selectedTab) {
+      await closeTab(selectedTab.id, paymentMethod, false);
+      setActiveModal(null);
+    }
   };
 
-  const handleAddOrderToTab = () => {
-    // This goes to the menu view with the selected tab
-    setSelectedTab(null);
-    // Keep selectedTable but go to menu
+  const handleRequestBill = async () => {
+    if (selectedTab) {
+      await requestBill(selectedTab.id);
+    }
   };
 
   useEffect(() => {
-    if (selectedTable && waiterStep === 'tabs') {
-      fetchTabsByLocation(selectedTable.name);
-    }
-  }, [selectedTable, waiterStep, fetchTabsByLocation]);
+    fetchTabsByLocation('');
+  }, [fetchTabsByLocation]);
 
   if (sent) {
     return (
@@ -108,76 +122,59 @@ export function WaiterView() {
     );
   }
 
-  if (waiterStep === 'tabs') {
-    const tableTabs = tabs.filter(t => t.location === selectedTable?.name);
-    
-    if (selectedTab) {
-      return (
-        <TabDetail
-          tab={selectedTab}
-          onBack={() => setSelectedTab(null)}
-          onAddOrder={handleAddOrderToTab}
-          onRequestBill={() => requestBill(selectedTab.id)}
-          onClose={(paymentMethod: PaymentMethod, direct: boolean) => closeTab(selectedTab.id, paymentMethod, direct)}
-          onCancel={(reason?: string) => cancelTab(selectedTab.id, reason)}
-        />
-      );
-    }
-
-    return (
-      <TabList
-        tabs={tableTabs}
-        location={selectedTable?.name || ''}
-        onSelectTab={handleSelectTab}
-        onNewTab={() => setOpenTabModal(true)}
-      />
-    );
-  }
-
   if (waiterStep === 'tables') {
-    const handleTableClick = (t: TableItem) => {
-      if (t.status === 'free') {
-        selectTable(t);
-      } else if (t.status === 'has-tabs') {
-        goToTabs(t);
-      } else {
-        // For occupied tables, go to tabs view to see if there are any open
-        goToTabs(t);
-      }
-    };
-
     return (
-      <div className={styles.tablesContainer}>
-        <div className={styles.headerWrapper}>
-          <h2 className={styles.pageTitle}>Seleccionar Mesa</h2>
-          <p className={styles.pageSubtitle}>Toca una mesa disponible para iniciar una orden</p>
-        </div>
-        <div className={styles.tablesGrid}>
-          {tables.map((t: TableItem, i: number) => (
-            <button
-              key={t.id}
-              className={`tb ${t.status === 'free' ? 'free' : 'occ'}`}
-              style={{ animationDelay: `${i * 0.05}s` } as React.CSSProperties}
-              onClick={() => handleTableClick(t)}
-            >
-              <div className={styles.tableIcon}>{t.type === 'bar' ? '🪑' : '🍽️'}</div>
-              <div className={styles.tableName}>{t.name}</div>
-              <div className={t.status === 'free' ? styles.tableStatusFree : t.status === 'has-tabs' ? styles.tableStatusTabs : styles.tableStatusOcc}>
-                {t.status === 'free' ? '● Libre' : t.status === 'has-tabs' ? '● Cuentas' : '● Ocupada'}
-              </div>
-            </button>
-          ))}
-        </div>
+      <>
+        <TableSelector
+          tables={tables}
+          tabsByTable={tabsByTable}
+          onSelectFree={(table) => {
+            selectTable(table);
+            setActiveModal('openTab');
+          }}
+          onSelectOccupied={(table) => {
+            selectTable(table);
+            setActiveModal('tabsList');
+          }}
+        />
 
-        {openTabModal && selectedTable && (
+        {activeModal === 'openTab' && selectedTable && (
           <OpenTabModal
-            location={selectedTable.name}
-            isBar={selectedTable.type === 'bar'}
-            onOpen={handleOpenTab}
-            onClose={() => setOpenTabModal(false)}
+            table={selectedTable}
+            onConfirm={handleOpenTab}
+            onClose={() => setActiveModal(null)}
           />
         )}
-      </div>
+
+        {activeModal === 'tabsList' && selectedTable && (
+          <TabsModal
+            table={selectedTable}
+            tabs={tabs.filter(t => t.location === selectedTable.name)}
+            onViewTab={(tab) => {
+              setSelectedTab(tab);
+              setActiveModal('tabDetail');
+            }}
+            onNewTab={() => setActiveModal('openTab')}
+            onClose={() => setActiveModal(null)}
+          />
+        )}
+
+        {activeModal === 'tabDetail' && selectedTab && selectedTable && (
+          <TabDetailModal
+            tab={selectedTab}
+            table={selectedTable}
+            onClose={() => setActiveModal('tabsList')}
+            onAddOrder={() => {
+              if (selectedTable) {
+                goToMenu(selectedTable);
+              }
+              setActiveModal(null);
+            }}
+            onRequestBill={handleRequestBill}
+            onCloseTab={handleCloseTab}
+          />
+        )}
+      </>
     );
   }
 

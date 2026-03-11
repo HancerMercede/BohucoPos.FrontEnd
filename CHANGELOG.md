@@ -1,5 +1,33 @@
 # Changelog - BOHUCO POS Frontend
 
+## [1.2.1] - 2026-03-11
+
+### Fixed - Tab System Integration Issues
+- **Payment Method Enum**: Backend expects numeric enum values (0=Cash, 1=Card, 2=Transfer), not string literals
+  - Fixed `closeTab` in orderStore.ts to convert payment method to numeric value
+  - Updated TabDetailModal to pass correct format
+
+- **Table Status Updates**: Tables now properly update based on active tabs from database
+  - All tables initialize as 'free'
+  - When tabs are loaded from DB, tables with active tabs become 'occupied'
+  - When a tab is closed and no more tabs exist for that table, it becomes 'free' again
+  - Fixed `getTableState` in TableSelector to handle both 'occupied' and 'has-tabs' status
+
+- **Selected Tab Context**: Fixed issue where new orders weren't linking to the correct tab
+  - `openTab` in orderStore now sets `selectedTab` after creating the tab
+  - `handleOpenTab` in WaiterView now calls `goToMenu` to navigate after opening tab
+
+- **Item Destination**: Items now correctly save their destination (Kitchen/Bar)
+  - Added `destination` field when creating orders in submitOrder
+  - Fixed mapping in `fetchTabsByLocation` to preserve `Destination` from backend
+
+- **UI Fixes**:
+  - "Volver" button now uses `goBackToTables()` to return to table selector
+  - Modal buttons now properly close and navigate after actions
+  - Fixed TabDetailModal to show action buttons for both 'OPEN' and 'Open' status
+
+---
+
 ## [1.2.0] - 2026-03-11
 
 ### Added - Tab System (Account/Tab Management)

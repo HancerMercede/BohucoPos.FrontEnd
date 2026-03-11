@@ -1,1 +1,0 @@
-export { TabDetail } from './TabDetail';

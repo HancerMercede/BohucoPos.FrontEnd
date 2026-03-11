@@ -1,0 +1,1 @@
+export { TabDetailModal } from './TabDetailModal';
