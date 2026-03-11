@@ -103,6 +103,7 @@ interface OrderStore {
   requestBill: (tabId: number) => Promise<void>;
   closeTab: (tabId: number, paymentMethod: PaymentMethod, directClose?: boolean) => Promise<void>;
   cancelTab: (tabId: number, reason?: string) => Promise<void>;
+  fetchBillPdf: (tabId: number) => Promise<string>;
   setSelectedTab: (tab: Tab | null) => void;
   goToTabs: (table: TableItem) => void;
   goToMenu: (table: TableItem) => void;
@@ -502,6 +503,13 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  fetchBillPdf: async (tabId) => {
+    const response = await fetch(`${API_URL}/api/tabs/${tabId}/pdf`);
+    if (!response.ok) throw new Error('Failed to fetch PDF');
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
   },
 }));
 

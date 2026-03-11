@@ -1,6 +1,7 @@
 import type { TabDetailModalProps, Order, OrderItem } from '../../../types'
 import { TAB_STATUS_COLORS, TAX_RATE } from '../../../constants/design'
 import { DestTag } from '../../../components/DestTag'
+import { useState } from 'react'
 import styles from './TabDetailModal.module.css'
 
 function OrderBlock({ order, index }: { order: Order; index: number }) {
@@ -36,6 +37,9 @@ function OrderBlock({ order, index }: { order: Order; index: number }) {
 }
 
 export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill, onCloseTab }: TabDetailModalProps) {
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  
   const s = TAB_STATUS_COLORS[tab.status]
   const subtotal = tab.orders.reduce(
     (sum, o) => sum + o.items.reduce((s, i) => s + (i.price || i.unitPrice || 0) * (i.qty || i.quantity || 0), 0), 0
@@ -44,6 +48,32 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
   const total = subtotal + tax
   const isOpen = tab.status === 'OPEN' || tab.status === 'Open'
   const isPending = tab.status === 'PENDING' || tab.status === 'Pending'
+
+  const handleRequestBill = async () => {
+    if (onRequestBill) {
+      await onRequestBill()
+    }
+    setPdfLoading(true)
+    try {
+      const response = await fetch(`https://localhost:7089/api/tabs/${tab.id}/pdf`)
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        setPdfUrl(url)
+      }
+    } catch (error) {
+      console.error('Failed to load PDF:', error)
+    } finally {
+      setPdfLoading(false)
+    }
+  }
+
+  const closePdf = () => {
+    if (pdfUrl) {
+      URL.revokeObjectURL(pdfUrl)
+      setPdfUrl(null)
+    }
+  }
 
   return (
     <div className={styles.overlay} onClick={onClose}>
@@ -109,7 +139,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
               <button
                 className={styles.btnRequestBill}
                 style={{ background: 'linear-gradient(135deg,#F97316,#EA580C)' }}
-                onClick={onRequestBill}
+                onClick={handleRequestBill}
               >
                 Pedir Cuenta
               </button>
@@ -143,6 +173,24 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
         </div>
 
       </div>
+
+      {(pdfUrl || pdfLoading) && (
+        <div className={styles.pdfOverlay} onClick={closePdf}>
+          <div className={styles.pdfModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.pdfHeader}>
+              <span className={styles.pdfTitle}>Cuenta - {tab.customerName}</span>
+              <button className={styles.pdfCloseBtn} onClick={closePdf}>✕</button>
+            </div>
+            <div className={styles.pdfContent}>
+              {pdfLoading ? (
+                <div className={styles.pdfLoading}>Cargando PDF...</div>
+              ) : pdfUrl ? (
+                <iframe src={pdfUrl} title="Bill PDF" className={styles.pdfFrame} />
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
