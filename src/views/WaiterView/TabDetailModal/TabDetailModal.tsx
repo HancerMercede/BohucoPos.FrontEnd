@@ -5,19 +5,22 @@ import styles from './TabDetailModal.module.css'
 
 function OrderBlock({ order, index }: { order: Order; index: number }) {
   const orderTotal = order.items.reduce((sum, i) => sum + (i.price || i.unitPrice || 0) * (i.qty || i.quantity || 0), 0)
+  
+  const orderId = order.idDisplay || order.idDisplay || `ORD-${order.id}`
+  const orderTime = order.createdAt ? new Date(order.createdAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''
 
   return (
     <div className={styles.orderBlock} style={{ animationDelay: `${index * 0.06}s` }}>
       <div className={styles.orderHeader}>
-        <span className={styles.orderId}>#{order.id}</span>
-        <span className={styles.orderTime}>{order.createdAt}</span>
+        <span className={styles.orderId}>{orderId}</span>
+        <span className={styles.orderTime}>{orderTime}</span>
         <span className={styles.orderSubtotal}>${orderTotal.toFixed(2)}</span>
       </div>
       <div className={styles.itemsList}>
         {order.items.map((item: OrderItem) => (
           <div key={item.id} className={styles.itemRow}>
-            <span className={styles.itemQty}>×{item.qty}</span>
-            <span className={styles.itemName}>{item.name}</span>
+            <span className={styles.itemQty}>×{item.qty || item.quantity}</span>
+            <span className={styles.itemName}>{item.name || item.productName}</span>
             <DestTag dest={item.dest || 'Kitchen'} />
             {item.notes && (
               <span className={styles.itemNote}>📝 {item.notes}</span>
@@ -54,7 +57,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
             <div>
               <h3 className={styles.title}>{tab.customerName}</h3>
               <p className={styles.subtitle}>
-                {table.name} · Abierta {tab.openedAt}
+                {table.name} · Abierta {tab.openedAt ? new Date(tab.openedAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''}
               </p>
             </div>
           </div>

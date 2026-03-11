@@ -194,7 +194,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
             unitPrice: item.price,
             quantity: item.qty,
             notes: item.notes || null,
-            destination: item.dest || 'Kitchen',
+            destination: item.dest === 'Bar' ? 1 : 0,
           })),
         }),
       });
@@ -340,11 +340,10 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
           orders: (t.orders || []).map((o: any) => ({
             ...o,
             status: mapStatus(o.status),
-            items: (o.items || []).map((i: any) => ({
-              ...i,
-              status: mapStatus(i.status),
-              dest: i.Destination || i.destination || i.dest || 'Kitchen',
-            })),
+            items: (o.items || []).map((i: any) => {
+              const dest = i.destination === 1 ? 'Bar' : (i.destination === 0 ? 'Kitchen' : i.dest || 'Kitchen');
+              return { ...i, status: mapStatus(i.status), dest };
+            }),
           })),
         }));
         set({ tabs: mappedTabs });
@@ -445,7 +444,6 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
 
   closeTab: async (tabId, paymentMethod, directClose = false) => {
     set({ isLoading: true });
-    console.log('Closing tab:', tabId, 'payment:', paymentMethod);
     
     const paymentMap: Record<string, number> = { Cash: 0, Card: 1, Transfer: 2 };
     const paymentValue = paymentMap[paymentMethod] ?? 1;
@@ -459,8 +457,6 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
           directClose,
         }),
       });
-      
-      console.log('Close response:', response.status, response.statusText);
       
       if (response.ok) {
         const { selectedTable } = get();

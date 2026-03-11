@@ -2,7 +2,18 @@
 
 ## [1.2.1] - 2026-03-11
 
+### Added - Item Destination (Kitchen/Bar)
+- Send destination when creating orders from frontend
+- Backend now accepts destination from frontend (0=Kitchen, 1=Bar)
+- Fixed item destination mapping in TabDetailModal
+- Uses lowercase "destination" to match backend response
+
 ### Fixed - Tab System Integration Issues
+
+- **Tab Entity ID Auto-Increment**: Fixed duplicate key error when opening tabs
+  - Removed manual static sequence in Tab.cs (was causing ID collision)
+  - Added `ValueGeneratedOnAdd()` to Tab Id in AppDbContext.cs
+  - Now uses database auto-increment instead of manual ID generation
 - **Payment Method Enum**: Backend expects numeric enum values (0=Cash, 1=Card, 2=Transfer), not string literals
   - Fixed `closeTab` in orderStore.ts to convert payment method to numeric value
   - Updated TabDetailModal to pass correct format
