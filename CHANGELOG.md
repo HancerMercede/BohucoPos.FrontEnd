@@ -28,6 +28,11 @@
 - Cancelled items hidden in PDF receipt
 - Cancelled items excluded from kitchen/bar displays
 
+### Fixed - Waiter Notifications
+- Backend now uses INotificationService to notify waiters via SignalR
+- When kitchen/bar updates item status, waiter receives real-time notification
+- Notification includes item ID, status, and product name
+
 ---
 
 ## [1.2.1] - 2026-03-11
