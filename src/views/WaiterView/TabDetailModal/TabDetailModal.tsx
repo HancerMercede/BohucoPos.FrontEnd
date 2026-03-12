@@ -80,9 +80,6 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
     if (billRequested) return
     
     setBillRequested(true)
-    if (onRequestBill) {
-      await onRequestBill()
-    }
     setPdfLoading(true)
     try {
       const response = await fetch(`https://localhost:7089/api/tabs/${tab.id}/pdf`)
@@ -98,10 +95,13 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
     }
   }
 
-  const closePdf = () => {
+  const closePdf = async () => {
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl)
       setPdfUrl(null)
+    }
+    if (onRequestBill) {
+      await onRequestBill()
     }
   }
 
