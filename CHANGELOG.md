@@ -9,9 +9,16 @@
 - Full CRUD endpoints: GET/POST/PUT/DELETE `/api/products`
 - GetProductsQuery supports filtering by destination
 
+### Backend Refactoring
+- Moved OrderCreatedEventHandler from API to Application layer (correct CQRS placement)
+- Refactored repositories to use primary constructor `context` parameter (removed `_context` field)
+- Created ServiceExtensions class with Configure* methods to organize DI configuration
+- **Breaking**: Removed manual sequence logic - now uses EF Core auto-increment for Order/OrderItem IDs
+
 ### Fixed - Backend
 - ProductsController GetById now returns single item (not collection)
 - RepositoryBase simplified - removed redundant `_context` field
+- Fixed syntax error in AppDbContext (extra parenthesis in HasConversion)
 
 ---
 
