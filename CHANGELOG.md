@@ -1,5 +1,20 @@
 # Changelog - BOHUCO POS Frontend
 
+## [Unreleased]
+
+### Added - Backend Product CRUD System
+- Product entity with ProductType enum (Service/Physical)
+- Service products: prepared items like Mojitos, Pizzas (no inventory)
+- Physical products: beer, soda (requires stock tracking)
+- Full CRUD endpoints: GET/POST/PUT/DELETE `/api/products`
+- GetProductsQuery supports filtering by destination
+
+### Fixed - Backend
+- ProductsController GetById now returns single item (not collection)
+- RepositoryBase simplified - removed redundant `_context` field
+
+---
+
 ## [1.3.0] - 2026-03-11
 
 ### Added - PDF Bill Generation
@@ -32,6 +47,34 @@
 - Backend now uses INotificationService to notify waiters via SignalR
 - When kitchen/bar updates item status, waiter receives real-time notification
 - Notification includes item ID, status, and product name
+- Added in-app toast notification component for waiter
+- **Note**: Feature pending authentication system - waiter needs to be identified to receive personalized notifications
+
+---
+
+## Next Steps (Roadmap)
+
+### Authentication System
+- Implement login for managers and waiters
+- **Status**: 0% completed
+- Required for: waiter notifications, role-based access control
+
+### Waiter Notifications (Real-time)
+- Waiter needs to join SignalR group on login
+- Route notifications to specific waiter by ID
+- **Status**: 20% completed (backend sends, frontend displays, needs auth to route)
+
+### Manager Dashboard
+- Full access to system: manage waiters, inventory, products
+- **Status**: 0% completed
+
+### Inventory Management
+- Track products and stock
+- **Status**: 0% completed
+
+### Product Management  
+- CRUD for menu items and categories
+- **Status**: 0% completed
 
 ---
 
