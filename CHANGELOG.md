@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Security - Environment Variables
+- Created `.env` and `.env.example` for API configuration
+- Hardcoded URLs replaced with environment variables (`VITE_API_URL`, `VITE_SIGNALR_URL`)
+- Added `.env` to `.gitignore` to prevent committing secrets
+- Updated orderStore and TabDetailModal to use environment variables
+
 ### Added - Backend Product CRUD System
 - Product entity with ProductType enum (Service/Physical)
 - Service products: prepared items like Mojitos, Pizzas (no inventory)

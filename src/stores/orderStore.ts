@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import * as signalR from '@microsoft/signalr';
 import type { TableItem, CartItem, Order, MenuItem, MenuCategory, ItemDestination, Tab, PaymentMethod } from '../types';
 
-const API_URL = 'https://localhost:7089';
-const SIGNALR_URL = 'https://localhost:7089/hubs/orders';
+const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
+const SIGNALR_URL = import.meta.env.VITE_SIGNALR_URL || 'https://localhost:7089/hubs/orders';
 
 const STATUS_MAP: Record<number, string> = {
   0: 'Pending',

@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { useOrderStore } from '../../../stores/orderStore'
 import styles from './TabDetailModal.module.css'
 
+const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
+
 function OrderBlock({ order, index }: { order: Order; index: number }) {
   const cancelItem = useOrderStore(s => s.cancelItem)
   const [cancelling, setCancelling] = useState<number | null>(null)
@@ -82,7 +84,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
     setBillRequested(true)
     setPdfLoading(true)
     try {
-      const response = await fetch(`https://localhost:7089/api/tabs/${tab.id}/pdf`)
+      const response = await fetch(`${API_URL}/api/tabs/${tab.id}/pdf`)
       if (response.ok) {
         const blob = await response.blob()
         const url = URL.createObjectURL(blob)
