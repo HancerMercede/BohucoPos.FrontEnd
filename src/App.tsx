@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Background } from './components/Background';
 import { TopBar } from './components/TopBar';
+import { Toast } from './components/Toast/Toast';
 import { WaiterView } from './views/WaiterView';
 import { DisplayView } from './views/DisplayView';
 import { OverviewView } from './views/OverviewView';
@@ -15,6 +16,7 @@ function App() {
     <>
       <Background />
       <TopBar view={view} setView={setView} />
+      <Toast />
       <div style={{ position: 'relative', zIndex: 1, minHeight: 'calc(100vh - 58px)' }}>
         <div style={{ maxWidth: 1280, margin: '0 auto', width: '100%' }}>
           {view === 'waiter' && <WaiterView />}

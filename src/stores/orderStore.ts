@@ -81,6 +81,7 @@ interface OrderStore {
   category: MenuCategory;
   sent: boolean;
   isLoading: boolean;
+  notification: { message: string; type: 'success' | 'error' | 'info' } | null;
   
   tabs: Tab[];
   selectedTab: Tab | null;
@@ -97,6 +98,7 @@ interface OrderStore {
   updateOrderItemStatus: (orderId: string, itemId: number, status: string) => Promise<void>;
   clearOrders: () => void;
   loadSignalR: () => void;
+  showNotification: (message: string, type: 'success' | 'error' | 'info') => void;
   
   fetchTabsByLocation: (location: string) => Promise<void>;
   fetchTabDetails: (tabId: number) => Promise<void>;
@@ -121,9 +123,15 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   category: 'Todos',
   sent: false,
   isLoading: false,
+  notification: null,
   
   tabs: [],
   selectedTab: null,
+
+  showNotification: (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    set({ notification: { message, type } });
+    setTimeout(() => set({ notification: null }), 5000);
+  },
 
   selectTable: (table) => {
     const { tabs } = get();
@@ -332,6 +340,9 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
 
     connection.on('OrderItemStatusChanged', (data: { ItemId: number; Status: string; ItemName: string }) => {
       console.log('Order item status changed:', data);
+      
+      get().showNotification(`${data.ItemName}: ${data.Status}`, 'info');
+      
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('Estado de orden actualizado', {
           body: `${data.ItemName}: ${data.Status}`,
