@@ -330,6 +330,16 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }));
     });
 
+    connection.on('OrderItemStatusChanged', (data: { ItemId: number; Status: string; ItemName: string }) => {
+      console.log('Order item status changed:', data);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Estado de orden actualizado', {
+          body: `${data.ItemName}: ${data.Status}`,
+          icon: '/favicon.ico'
+        });
+      }
+    });
+
     connection.start().catch(console.error);
   },
 
