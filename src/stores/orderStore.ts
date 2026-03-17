@@ -78,6 +78,7 @@ interface OrderStore {
   tables: TableItem[];
   cart: CartItem[];
   orders: Order[];
+  products: MenuItem[];
   selectedTable: TableItem | null;
   waiterStep: 'tables' | 'menu' | 'tabs';
   category: MenuCategory;
@@ -101,6 +102,7 @@ interface OrderStore {
   clearOrders: () => void;
   loadSignalR: () => void;
   showNotification: (message: string, type: 'success' | 'error' | 'info') => void;
+  fetchProducts: () => Promise<void>;
   
   fetchTabsByLocation: (location: string) => Promise<void>;
   fetchTabDetails: (tabId: number) => Promise<void>;
@@ -120,6 +122,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   tables: defaultTables,
   cart: [],
   orders: [],
+  products: [],
   selectedTable: null,
   waiterStep: 'tables',
   category: 'Todos',
@@ -129,6 +132,31 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   
   tabs: [],
   selectedTab: null,
+
+  fetchProducts: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await fetch(`${API_URL}/api/products`, { headers: getAuthHeaders() });
+      if (response.ok) {
+        const products = await response.json();
+        const mappedProducts = products
+          .filter((p: any) => p.isActive)
+          .map((p: any) => ({
+            id: String(p.id),
+            name: p.name,
+            price: p.price,
+            dest: p.destination,
+            category: p.category,
+            emoji: p.emoji || '🍽️',
+          }));
+        set({ products: mappedProducts });
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
   showNotification: (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     set({ notification: { message, type } });

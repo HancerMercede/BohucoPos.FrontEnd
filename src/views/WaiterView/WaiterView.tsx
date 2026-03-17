@@ -11,30 +11,6 @@ import type { MenuCategory, Tab, PaymentMethod } from '../../types';
 
 const categories: MenuCategory[] = ['Todos', 'Platos', 'Entradas', 'Bebidas'];
 
-interface MenuItem {
-  id: string;
-  name: string;
-  price: number;
-  dest: 'Kitchen' | 'Bar';
-  category: 'Platos' | 'Entradas' | 'Bebidas';
-  emoji: string;
-}
-
-const menuItemsData: MenuItem[] = [
-  { id: 'p1', name: 'Pollo a la Brasa', price: 12.5, dest: 'Kitchen', category: 'Platos', emoji: '🍗' },
-  { id: 'p2', name: 'Pasta Carbonara', price: 11.0, dest: 'Kitchen', category: 'Platos', emoji: '🍝' },
-  { id: 'p3', name: 'Pizza Margarita', price: 10.5, dest: 'Kitchen', category: 'Platos', emoji: '🍕' },
-  { id: 'p4', name: 'Ensalada César', price: 8.0, dest: 'Kitchen', category: 'Entradas', emoji: '🥗' },
-  { id: 'p5', name: 'Nachos', price: 7.5, dest: 'Kitchen', category: 'Entradas', emoji: '🧀' },
-  { id: 'p6', name: 'Burger Clásica', price: 13.0, dest: 'Kitchen', category: 'Platos', emoji: '🍔' },
-  { id: 'p7', name: 'Mojito', price: 9.0, dest: 'Bar', category: 'Bebidas', emoji: '🍹' },
-  { id: 'p8', name: 'Negroni', price: 11.0, dest: 'Bar', category: 'Bebidas', emoji: '🍸' },
-  { id: 'p9', name: 'Vino Tinto', price: 8.5, dest: 'Bar', category: 'Bebidas', emoji: '🍷' },
-  { id: 'p10', name: 'Cerveza Artesanal', price: 6.5, dest: 'Bar', category: 'Bebidas', emoji: '🍺' },
-  { id: 'p11', name: 'Coca-Cola', price: 3.0, dest: 'Bar', category: 'Bebidas', emoji: '🥤' },
-  { id: 'p12', name: 'Papas Fritas', price: 5.0, dest: 'Kitchen', category: 'Entradas', emoji: '🍟' },
-];
-
 type ModalType = 'openTab' | 'tabsList' | 'tabDetail' | null;
 
 export function WaiterView() {
@@ -47,7 +23,7 @@ export function WaiterView() {
     sent,
     isLoading,
     tabs,
-    selectedTab,
+    products,
     selectTable,
     goToMenu,
     goBackToTables,
@@ -60,6 +36,7 @@ export function WaiterView() {
     openTab,
     requestBill,
     closeTab,
+    selectedTab,
     setSelectedTab,
   } = useOrderStore();
 
@@ -82,7 +59,7 @@ export function WaiterView() {
   }, [tabs, tables]);
 
   const filteredItems = useMemo(() => {
-    return category === 'Todos' ? menuItemsData : menuItemsData.filter(m => m.category === category);
+    return category === 'Todos' ? products : products.filter(m => m.category === category);
   }, [category]);
 
   const total = useMemo(() => cart.reduce((s, c) => s + c.price * c.qty, 0), [cart]);

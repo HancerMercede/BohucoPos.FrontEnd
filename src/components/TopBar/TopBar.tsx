@@ -10,6 +10,13 @@ export function TopBar({ view, setView }: TopBarProps) {
     logout();
   };
 
+  const visibleTabs = NAV_TABS.filter(tab => {
+    if (tab.id === 'products') {
+      return user?.role === 'Admin';
+    }
+    return true;
+  });
+
   return (
     <nav className={styles.nav}>
       <div className={styles.inner}>
@@ -23,7 +30,7 @@ export function TopBar({ view, setView }: TopBarProps) {
         </div>
 
         <div className={styles.tabsWrapper}>
-          {NAV_TABS.map((tab) => (
+          {visibleTabs.map((tab) => (
             <button
               key={tab.id}
               className={`nb ${view === tab.id ? "on" : ""}`}
@@ -41,7 +48,7 @@ export function TopBar({ view, setView }: TopBarProps) {
           <span className={styles.separator} />
           {user && (
             <>
-              <span className={styles.userName}>{user.fullName || user.username}</span>
+              <span className={styles.userName}>{user.fullName?.split(' ')[0] || user.username.split('@')[0]}</span>
               <button onClick={handleLogout} className={styles.logoutBtn}>
                 Salir
               </button>

@@ -5,6 +5,7 @@ import { Toast } from './components/Toast/Toast';
 import { WaiterView } from './views/WaiterView';
 import { DisplayView } from './views/DisplayView';
 import { OverviewView } from './views/OverviewView';
+import { ProductsView } from './views/ProductsView/ProductsView';
 import { LoginView } from './views/LoginView/LoginView';
 import { useAuthStore } from './stores/authStore';
 import { useOrderStore } from './stores/orderStore';
@@ -16,12 +17,14 @@ function App() {
   const [view, setView] = useState<ViewId>('waiter');
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const loadSignalR = useOrderStore((state) => state.loadSignalR);
+  const fetchProducts = useOrderStore((state) => state.fetchProducts);
 
   useEffect(() => {
     if (isAuthenticated) {
       loadSignalR();
+      fetchProducts();
     }
-  }, [isAuthenticated, loadSignalR]);
+  }, [isAuthenticated, loadSignalR, fetchProducts]);
 
   if (!isAuthenticated) {
     return (
@@ -43,6 +46,7 @@ function App() {
           {view === 'kitchen' && <DisplayView dest="Kitchen" />}
           {view === 'bar' && <DisplayView dest="Bar" />}
           {view === 'overview' && <OverviewView />}
+          {view === 'products' && <ProductsView />}
         </div>
       </div>
     </>

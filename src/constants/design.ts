@@ -82,4 +82,5 @@ export const NAV_TABS = [
   { id: 'kitchen',  icon: '🍳', label: 'Cocina'  },
   { id: 'bar',      icon: '🍹', label: 'Barra'   },
   { id: 'overview', icon: '📊', label: 'Resumen' },
+  { id: 'products', icon: '📦', label: 'Productos' },
 ] as const
