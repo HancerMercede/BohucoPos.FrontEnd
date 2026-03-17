@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useOrderStore } from '../../stores/orderStore';
+import { useAuthStore } from '../../stores/authStore';
 import { DestTag } from '../../components/DestTag';
 import { TableSelector } from './TableSelector';
 import { OpenTabModal } from './OpenTabModal';
@@ -62,6 +63,9 @@ export function WaiterView() {
     setSelectedTab,
   } = useOrderStore();
 
+  const { user } = useAuthStore();
+  const waiterName = user?.username || 'Mesero';
+
   const [noteModal, setNoteModal] = useState<{ id: string; note: string } | null>(null);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
@@ -84,12 +88,12 @@ export function WaiterView() {
   const total = useMemo(() => cart.reduce((s, c) => s + c.price * c.qty, 0), [cart]);
 
   const handleSend = () => {
-    submitOrder('Mesero');
+    submitOrder(waiterName);
   };
 
   const handleOpenTab = async (customerName: string) => {
     if (selectedTable) {
-      await openTab(selectedTable.name, customerName || 'Cliente', 'waiter-1', 'Mesero');
+      await openTab(selectedTable.name, customerName || 'Cliente', waiterName, waiterName);
       setActiveModal(null);
       goToMenu(selectedTable);
     }

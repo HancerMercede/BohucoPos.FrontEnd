@@ -95,3 +95,29 @@
   color: rgba(255,255,255,.38);
   font-weight: 500;
 }
+
+.userName {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+}
+
+.logoutBtn {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.25);
+}

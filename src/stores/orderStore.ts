@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import * as signalR from '@microsoft/signalr';
 import type { TableItem, CartItem, Order, MenuItem, MenuCategory, ItemDestination, Tab, PaymentMethod } from '../types';
+import { getAuthHeaders } from '../utils/api';
+import { useAuthStore } from './authStore';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
 const SIGNALR_URL = import.meta.env.VITE_SIGNALR_URL || 'https://localhost:7089/hubs/orders';
@@ -202,7 +204,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     try {
       const response = await fetch(`${API_URL}/api/orders`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           orderType,
           tableId: selectedTable?.id || null,
@@ -224,7 +226,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
         if (selectedTab && selectedTable) {
           await fetch(`${API_URL}/api/tabs/orders`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
             body: JSON.stringify({ TabId: selectedTab.id, OrderId: orderId }),
           });
           
@@ -250,7 +252,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     set({ isLoading: true});
     try {
       const destination = dest === 'Kitchen' ? 0 : 1;
-      const response = await fetch(`${API_URL}/api/orders/pending/${destination}`);
+      const response = await fetch(`${API_URL}/api/orders/pending/${destination}`, { headers: getAuthHeaders() });
       if (response.ok) {
         const orders = await response.json();
         const mappedOrders = orders.map((o: any) => ({
@@ -298,7 +300,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     try {
       const response = await fetch(`${API_URL}/api/orders/items/${itemId}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ Status: statusNumber }),
       });
       
@@ -317,8 +319,13 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   },
 
   loadSignalR: () => {
+    const token = useAuthStore.getState().token;
+    const username = useAuthStore.getState().user?.username;
+    
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(SIGNALR_URL)
+      .withUrl(SIGNALR_URL, {
+        accessTokenFactory: () => token || '',
+      })
       .withAutomaticReconnect()
       .build();
 
@@ -338,27 +345,24 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }));
     });
 
-    connection.on('OrderItemStatusChanged', (data: { ItemId: number; Status: string; ItemName: string }) => {
-      console.log('Order item status changed:', data);
-      
+    connection.on('OrderItemStatusChanged', (data: { ItemId: number; Status: string; ItemName: string; OrderId: number }) => {
       get().showNotification(`${data.ItemName}: ${data.Status}`, 'info');
-      
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('Estado de orden actualizado', {
-          body: `${data.ItemName}: ${data.Status}`,
-          icon: '/favicon.ico'
-        });
-      }
     });
 
-    connection.start().catch(console.error);
+    connection.start()
+      .then(async () => {
+        if (username) {
+          await connection.invoke('JoinWaiterGroup', username);
+        }
+      })
+      .catch(console.error);
   },
 
   fetchTabsByLocation: async (location) => {
     set({ isLoading: true });
     try {
       const endpoint = location ? `/api/tabs/location/${encodeURIComponent(location)}` : '/api/tabs/active';
-      const response = await fetch(`${API_URL}${endpoint}`);
+      const response = await fetch(`${API_URL}${endpoint}`, { headers: getAuthHeaders() });
       if (response.ok) {
         const tabs = await response.json();
         const mappedTabs = tabs.map((t: any) => ({
@@ -389,7 +393,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   fetchTabDetails: async (tabId) => {
     set({ isLoading: true });
     try {
-      const response = await fetch(`${API_URL}/api/tabs/${tabId}`);
+      const response = await fetch(`${API_URL}/api/tabs/${tabId}`, { headers: getAuthHeaders() });
       if (response.ok) {
         const tab = await response.json();
         const mappedTab = {
@@ -415,7 +419,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     try {
       const response = await fetch(`${API_URL}/api/tabs`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           location,
           customerName,
@@ -447,6 +451,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     try {
       const response = await fetch(`${API_URL}/api/tabs/${tabId}/request-bill`, {
         method: 'POST',
+        headers: getAuthHeaders(),
       });
       
       if (response.ok) {
@@ -472,7 +477,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     try {
       const response = await fetch(`${API_URL}/api/tabs/${tabId}/close`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({
           paymentMethod: paymentValue,
           directClose,
@@ -510,7 +515,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     try {
       const response = await fetch(`${API_URL}/api/tabs/${tabId}/cancel`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ reason }),
       });
       
@@ -529,7 +534,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   },
 
   fetchBillPdf: async (tabId) => {
-    const response = await fetch(`${API_URL}/api/tabs/${tabId}/pdf`);
+    const response = await fetch(`${API_URL}/api/tabs/${tabId}/pdf`, { headers: getAuthHeaders() });
     if (!response.ok) throw new Error('Failed to fetch PDF');
     const blob = await response.blob();
     return URL.createObjectURL(blob);
@@ -540,7 +545,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     try {
       const response = await fetch(`${API_URL}/api/orders/items/${itemId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ reason }),
       });
       

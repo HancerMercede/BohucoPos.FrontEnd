@@ -1,16 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Background } from './components/Background';
 import { TopBar } from './components/TopBar';
 import { Toast } from './components/Toast/Toast';
 import { WaiterView } from './views/WaiterView';
 import { DisplayView } from './views/DisplayView';
 import { OverviewView } from './views/OverviewView';
+import { LoginView } from './views/LoginView/LoginView';
+import { useAuthStore } from './stores/authStore';
+import { useOrderStore } from './stores/orderStore';
 import type { ViewId } from './types';
 import './styles/variables.css';
 import './styles/globals.css';
 
 function App() {
   const [view, setView] = useState<ViewId>('waiter');
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const loadSignalR = useOrderStore((state) => state.loadSignalR);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSignalR();
+    }
+  }, [isAuthenticated, loadSignalR]);
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <Background />
+        <LoginView />
+      </>
+    );
+  }
 
   return (
     <>

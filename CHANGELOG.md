@@ -2,11 +2,17 @@
 
 ## [Unreleased]
 
-### Security - Environment Variables
-- Created `.env` and `.env.example` for API configuration
-- Hardcoded URLs replaced with environment variables (`VITE_API_URL`, `VITE_SIGNALR_URL`)
-- Added `.env` to `.gitignore` to prevent committing secrets
-- Updated orderStore and TabDetailModal to use environment variables
+### Added - Authentication System
+- Login/Register page with JWT authentication
+- Auth store with token persistence in localStorage
+- Logout button and user name display in TopBar
+- Protected routes - must login to access app
+
+### Added - Real-time Notifications
+- SignalR integration with JWT authentication
+- Waiter joins personal SignalR group on login
+- Toast notifications when kitchen/bar changes order item status
+- Notifications routed to correct waiter by username
 
 ### Added - Backend Product CRUD System
 - Product entity with ProductType enum (Service/Physical)
@@ -14,6 +20,12 @@
 - Physical products: beer, soda (requires stock tracking)
 - Full CRUD endpoints: GET/POST/PUT/DELETE `/api/products`
 - GetProductsQuery supports filtering by destination
+
+### Security - Environment Variables
+- Created `.env` and `.env.example` for API configuration
+- Hardcoded URLs replaced with environment variables (`VITE_API_URL`, `VITE_SIGNALR_URL`)
+- Added `.env` to `.gitignore` to prevent committing secrets
+- Updated orderStore and TabDetailModal to use environment variables
 
 ### Backend Refactoring
 - Moved OrderCreatedEventHandler from API to Application layer (correct CQRS placement)
