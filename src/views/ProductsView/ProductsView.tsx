@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useOrderStore } from '../../stores/orderStore';
+import { useNotificationStore } from '../../stores/notificationStore';
 import { getAuthHeaders } from '../../utils/api';
 import { ERROR_MESSAGES } from '../../constants/messages';
 import { ProductSearch } from './ProductSearch';
@@ -13,7 +13,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
 const ITEMS_PER_PAGE = 5;
 
 export function ProductsView() {
-  const { showNotification } = useOrderStore();
+  const showNotification = useNotificationStore((s) => s.showNotification);
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

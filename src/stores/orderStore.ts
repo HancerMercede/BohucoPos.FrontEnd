@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import type { TableItem, CartItem, Order, MenuItem, MenuCategory, ItemDestination, Tab, PaymentMethod } from '../types';
 import { getAuthHeaders } from '../utils/api';
 import { useAuthStore } from './authStore';
+import { useNotificationStore } from './notificationStore';
 import { ERROR_MESSAGES } from '../constants/messages';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
@@ -60,21 +61,6 @@ const defaultTables: TableItem[] = [
   { id: 'b2', name: 'Barra 2', status: 'free', type: 'bar' },
 ];
 
-const menuItems: MenuItem[] = [
-  { id: 'p1', name: 'Pollo a la Brasa', price: 12.5, dest: 'Kitchen', category: 'Platos', emoji: '🍗' },
-  { id: 'p2', name: 'Pasta Carbonara', price: 11.0, dest: 'Kitchen', category: 'Platos', emoji: '🍝' },
-  { id: 'p3', name: 'Pizza Margarita', price: 10.5, dest: 'Kitchen', category: 'Platos', emoji: '🍕' },
-  { id: 'p4', name: 'Ensalada César', price: 8.0, dest: 'Kitchen', category: 'Entradas', emoji: '🥗' },
-  { id: 'p5', name: 'Nachos', price: 7.5, dest: 'Kitchen', category: 'Entradas', emoji: '🧀' },
-  { id: 'p6', name: 'Burger Clásica', price: 13.0, dest: 'Kitchen', category: 'Platos', emoji: '🍔' },
-  { id: 'p7', name: 'Mojito', price: 9.0, dest: 'Bar', category: 'Bebidas', emoji: '🍹' },
-  { id: 'p8', name: 'Negroni', price: 11.0, dest: 'Bar', category: 'Bebidas', emoji: '🍸' },
-  { id: 'p9', name: 'Vino Tinto', price: 8.5, dest: 'Bar', category: 'Bebidas', emoji: '🍷' },
-  { id: 'p10', name: 'Cerveza Artesanal', price: 6.5, dest: 'Bar', category: 'Bebidas', emoji: '🍺' },
-  { id: 'p11', name: 'Coca-Cola', price: 3.0, dest: 'Bar', category: 'Bebidas', emoji: '🥤' },
-  { id: 'p12', name: 'Papas Fritas', price: 5.0, dest: 'Kitchen', category: 'Entradas', emoji: '🍟' },
-];
-
 interface OrderStore {
   tables: TableItem[];
   cart: CartItem[];
@@ -85,7 +71,6 @@ interface OrderStore {
   category: MenuCategory;
   sent: boolean;
   isLoading: boolean;
-  notification: { message: string; type: 'success' | 'error' | 'info' } | null;
   
   tabs: Tab[];
   selectedTab: Tab | null;
@@ -102,7 +87,6 @@ interface OrderStore {
   updateOrderItemStatus: (orderId: string, itemId: number, status: string) => Promise<void>;
   clearOrders: () => void;
   loadSignalR: () => void;
-  showNotification: (message: string, type: 'success' | 'error' | 'info') => void;
   fetchProducts: () => Promise<void>;
   
   fetchTabsByLocation: (location: string) => Promise<void>;
@@ -129,7 +113,6 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   category: 'Todos',
   sent: false,
   isLoading: false,
-  notification: null,
   
   tabs: [],
   selectedTab: null,
@@ -154,15 +137,10 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch products:', error);
-      get().showNotification(ERROR_MESSAGES.fetchProducts, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.fetchProducts, 'error');
     } finally {
       set({ isLoading: false });
     }
-  },
-
-  showNotification: (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-    set({ notification: { message, type } });
-    setTimeout(() => set({ notification: null }), 5000);
   },
 
   selectTable: (table) => {
@@ -273,7 +251,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to submit order:', error);
-      get().showNotification(ERROR_MESSAGES.submitOrder, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.submitOrder, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -312,7 +290,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error);
-      get().showNotification(ERROR_MESSAGES.fetchOrders, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.fetchOrders, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -379,7 +357,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     });
 
     connection.on('OrderItemStatusChanged', (data: { ItemId: number; Status: string; ItemName: string; OrderId: number }) => {
-      get().showNotification(`${data.ItemName}: ${data.Status}`, 'info');
+      useNotificationStore.getState().showNotification(`${data.ItemName}: ${data.Status}`, 'info');
     });
 
     connection.start()
@@ -418,7 +396,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch tabs:', error);
-      get().showNotification(ERROR_MESSAGES.fetchTabs, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.fetchTabs, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -443,7 +421,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch tab details:', error);
-      get().showNotification(ERROR_MESSAGES.fetchTabDetails, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.fetchTabDetails, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -498,7 +476,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to request bill:', error);
-      get().showNotification(ERROR_MESSAGES.requestBill, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.requestBill, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -541,7 +519,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to close tab:', error);
-      get().showNotification(ERROR_MESSAGES.closeTab, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.closeTab, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -565,7 +543,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to cancel tab:', error);
-      get().showNotification(ERROR_MESSAGES.cancelTab, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.cancelTab, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -597,12 +575,11 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to cancel item:', error);
-      get().showNotification(ERROR_MESSAGES.cancelItem, 'error');
+      useNotificationStore.getState().showNotification(ERROR_MESSAGES.cancelItem, 'error');
     } finally {
       set({ isLoading: false });
     }
   },
 }));
 
-export const useMenuItems = () => menuItems;
 export { defaultTables };

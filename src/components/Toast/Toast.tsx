@@ -1,8 +1,8 @@
-import { useOrderStore } from '../../stores/orderStore';
+import { useNotificationStore } from '../../stores/notificationStore';
 import styles from './Toast.module.css';
 
 export function Toast() {
-  const notification = useOrderStore((s: any) => s.notification);
+  const notification = useNotificationStore((s) => s.notification);
   
   if (!notification) return null;
   
