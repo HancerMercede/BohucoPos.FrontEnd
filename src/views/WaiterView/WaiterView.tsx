@@ -41,7 +41,7 @@ export function WaiterView() {
   } = useOrderStore();
 
   const { user } = useAuthStore();
-  const waiterName = user?.username || 'Mesero';
+  const waiterName = user?.fullName?.split(' ')[0] || 'Mesero';
 
   const [noteModal, setNoteModal] = useState<{ id: string; note: string } | null>(null);
   const [activeModal, setActiveModal] = useState<ModalType>(null);

@@ -212,7 +212,11 @@ export function ManagerDashboardView() {
                   ) : (
                     salesData.waiterPerformance.map((waiter) => (
                       <div key={waiter.waiterName} className={styles.waiterItem}>
-                        <span className={styles.waiterName}>{waiter.waiterName}</span>
+                        <span className={styles.waiterName}>
+                          {waiter.waiterName.includes('@') 
+                            ? waiter.waiterName.split('@')[0] 
+                            : waiter.waiterName.split(' ')[0]}
+                        </span>
                         <span className={styles.waiterOrders}>{waiter.orderCount} órdenes</span>
                         <span className={styles.waiterRevenue}>${waiter.totalRevenue.toFixed(2)}</span>
                       </div>

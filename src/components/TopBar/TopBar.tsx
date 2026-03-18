@@ -14,6 +14,9 @@ export function TopBar({ view, setView }: TopBarProps) {
     if (tab.id === 'products' || tab.id === 'manager') {
       return user?.role === 'Admin';
     }
+    if (user?.role === 'Admin') {
+      return tab.id === 'products' || tab.id === 'manager' || tab.id === 'overview';
+    }
     return true;
   });
 
@@ -48,7 +51,9 @@ export function TopBar({ view, setView }: TopBarProps) {
           <span className={styles.separator} />
           {user && (
             <>
-              <span className={styles.userName}>{user.fullName?.split(' ')[0] || user.username.split('@')[0]}</span>
+              <span className={styles.userName}>
+                {user.fullName?.split(' ')[0] || 'Usuario'}
+              </span>
               <button onClick={handleLogout} className={styles.logoutBtn}>
                 Salir
               </button>
