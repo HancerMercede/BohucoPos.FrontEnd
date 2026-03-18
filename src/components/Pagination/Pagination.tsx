@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import styles from './Pagination.module.css';
 
 interface PaginationProps {
   currentPage: number;
@@ -14,30 +15,28 @@ export function Pagination({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between px-6 py-4 bg-slate-900/40 border-t border-white/5 rounded-b-3xl">
-      <div className="flex flex-col text-white">
-        <span className="text-[10px] text-cyan-300 font-black uppercase ">
-          Página
-        </span>
-        <p className="text-xs font-bold">
+    <div className={styles.container}>
+      <div className={styles.pageInfo}>
+        <span className={styles.pageLabel}>Página</span>
+        <p className={styles.pageNumber}>
           {currentPage} de {totalPages}
         </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className={styles.buttons}>
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-950/50 border border-white/5 disabled:opacity-20"
+          className={styles.button}
         >
-          <ChevronLeft size={18} className="text-white" />
+          <ChevronLeft size={18} />
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-950/50 border border-white/5 disabled:opacity-20"
+          className={styles.button}
         >
-          <ChevronRight size={18} className="text-white" />
+          <ChevronRight size={18} />
         </button>
       </div>
     </div>
