@@ -6,6 +6,7 @@ import { WaiterView } from './views/WaiterView';
 import { DisplayView } from './views/DisplayView';
 import { OverviewView } from './views/OverviewView';
 import { ProductsView } from './views/ProductsView/ProductsView';
+import { ManagerDashboardView } from './views/ManagerDashboardView/ManagerDashboardView';
 import { LoginView } from './views/LoginView/LoginView';
 import { useAuthStore } from './stores/authStore';
 import { useOrderStore } from './stores/orderStore';
@@ -46,6 +47,7 @@ function App() {
           {view === 'kitchen' && <DisplayView dest="Kitchen" />}
           {view === 'bar' && <DisplayView dest="Bar" />}
           {view === 'overview' && <OverviewView />}
+          {view === 'manager' && <ManagerDashboardView />}
           {view === 'products' && <ProductsView />}
         </div>
       </div>

@@ -11,7 +11,7 @@ export function TopBar({ view, setView }: TopBarProps) {
   };
 
   const visibleTabs = NAV_TABS.filter(tab => {
-    if (tab.id === 'products') {
+    if (tab.id === 'products' || tab.id === 'manager') {
       return user?.role === 'Admin';
     }
     return true;
