@@ -1,6 +1,7 @@
 import type { TabDetailModalProps, Order, OrderItem } from '../../../types'
 import { TAB_STATUS_COLORS, TAX_RATE } from '../../../constants/design'
 import { DestTag } from '../../../components/DestTag'
+import { getAuthHeaders } from '../../../utils/api'
 import { useState } from 'react'
 import { useOrderStore } from '../../../stores/orderStore'
 import styles from './TabDetailModal.module.css'
@@ -84,7 +85,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
     setBillRequested(true)
     setPdfLoading(true)
     try {
-      const response = await fetch(`${API_URL}/api/tabs/${tab.id}/pdf`)
+      const response = await fetch(`${API_URL}/api/tabs/${tab.id}/pdf`, { headers: getAuthHeaders() })
       if (response.ok) {
         const blob = await response.blob()
         const url = URL.createObjectURL(blob)
