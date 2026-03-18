@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useOrderStore } from '../../stores/orderStore';
 import { useCartStore } from '../../stores/cartStore';
+import { useProductStore } from '../../stores/productStore';
 import { useAuthStore } from '../../stores/authStore';
 import { DestTag } from '../../components/DestTag';
 import { TableSelector } from './TableSelector';
@@ -16,6 +17,7 @@ type ModalType = 'openTab' | 'tabsList' | 'tabDetail' | null;
 
 export function WaiterView() {
   const cart = useCartStore((s) => s.cart);
+  const products = useProductStore((s) => s.products);
   const {
     tables,
     selectedTable,
@@ -24,7 +26,6 @@ export function WaiterView() {
     sent,
     isLoading,
     tabs,
-    products,
     selectTable,
     goToMenu,
     goBackToTables,
