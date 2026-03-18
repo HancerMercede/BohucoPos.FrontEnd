@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useOrderStore } from '../../stores/orderStore';
 import { getAuthHeaders } from '../../utils/api';
+import { ERROR_MESSAGES } from '../../constants/messages';
 import { ProductSearch } from './ProductSearch';
 import { ProductList, type Product } from './ProductList';
 import { ProductModal, type ProductFormData } from './ProductModal';
@@ -34,6 +35,7 @@ export function ProductsView() {
       }
     } catch (error) {
       console.error('Failed to fetch products:', error);
+      showNotification(ERROR_MESSAGES.loadProducts, 'error');
     } finally {
       setIsLoading(false);
     }

@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import type { TableItem, CartItem, Order, MenuItem, MenuCategory, ItemDestination, Tab, PaymentMethod } from '../types';
 import { getAuthHeaders } from '../utils/api';
 import { useAuthStore } from './authStore';
+import { ERROR_MESSAGES } from '../constants/messages';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
 const SIGNALR_URL = import.meta.env.VITE_SIGNALR_URL || 'https://localhost:7089/hubs/orders';
@@ -153,6 +154,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch products:', error);
+      get().showNotification(ERROR_MESSAGES.fetchProducts, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -271,6 +273,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to submit order:', error);
+      get().showNotification(ERROR_MESSAGES.submitOrder, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -309,6 +312,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error);
+      get().showNotification(ERROR_MESSAGES.fetchOrders, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -414,6 +418,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch tabs:', error);
+      get().showNotification(ERROR_MESSAGES.fetchTabs, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -438,6 +443,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to fetch tab details:', error);
+      get().showNotification(ERROR_MESSAGES.fetchTabDetails, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -492,6 +498,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to request bill:', error);
+      get().showNotification(ERROR_MESSAGES.requestBill, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -534,6 +541,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to close tab:', error);
+      get().showNotification(ERROR_MESSAGES.closeTab, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -557,6 +565,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to cancel tab:', error);
+      get().showNotification(ERROR_MESSAGES.cancelTab, 'error');
     } finally {
       set({ isLoading: false });
     }
@@ -588,6 +597,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
       }
     } catch (error) {
       console.error('Failed to cancel item:', error);
+      get().showNotification(ERROR_MESSAGES.cancelItem, 'error');
     } finally {
       set({ isLoading: false });
     }
