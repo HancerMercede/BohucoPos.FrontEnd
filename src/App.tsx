@@ -15,10 +15,16 @@ import './styles/variables.css';
 import './styles/globals.css';
 
 function App() {
-  const [view, setView] = useState<ViewId>('waiter');
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const defaultView = useAuthStore((state) => state.defaultView);
+  const user = useAuthStore((state) => state.user);
   const loadSignalR = useOrderStore((state) => state.loadSignalR);
   const fetchProducts = useOrderStore((state) => state.fetchProducts);
+  const [view, setView] = useState<ViewId>(defaultView);
+
+  useEffect(() => {
+    setView(defaultView);
+  }, [user]);
 
   useEffect(() => {
     if (isAuthenticated) {
