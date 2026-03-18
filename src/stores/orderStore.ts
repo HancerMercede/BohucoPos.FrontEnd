@@ -348,7 +348,8 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
 
   loadSignalR: () => {
     const token = useAuthStore.getState().token;
-    const username = useAuthStore.getState().user?.username;
+    const user = useAuthStore.getState().user;
+    const waiterName = user?.fullName?.split(' ')[0] || user?.username || '';
     
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(SIGNALR_URL, {
@@ -379,8 +380,8 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
 
     connection.start()
       .then(async () => {
-        if (username) {
-          await connection.invoke('JoinWaiterGroup', username);
+        if (waiterName) {
+          await connection.invoke('JoinWaiterGroup', waiterName);
         }
       })
       .catch(console.error);
