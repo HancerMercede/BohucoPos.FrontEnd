@@ -2,11 +2,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 24px;
-  margin-top: 16px;
+  padding: 1rem 1.5rem;
+  margin-top: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 1rem 1rem;
 }
 
 .pageInfo {
@@ -16,29 +16,29 @@
 }
 
 .pageLabel {
-  font-size: 10px;
+  font-size: 0.625rem;
   color: #22d3ee;
   font-weight: 800;
   text-transform: uppercase;
 }
 
 .pageNumber {
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
 .buttons {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .button {
-  width: 40px;
-  height: 40px;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
