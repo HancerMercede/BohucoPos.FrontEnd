@@ -8,6 +8,22 @@
 - Logout button and user name display in TopBar
 - Protected routes - must login to access app
 
+### Added - Role-based Access Control
+- Products tab visible only to Admin role
+- JWT authentication required for all API endpoints
+- User roles: Waiter, Kitchen, Bar, Admin
+
+### Added - ProductsView (Admin)
+- Full CRUD for products (create, read, update, delete)
+- List view with search functionality
+- Custom delete confirmation modal
+- Products managed via API (`/api/products`)
+- Refactored into clean components:
+  - ProductSearch - search input
+  - ProductList - product list display
+  - ProductModal - add/edit form
+  - ConfirmModal - delete confirmation
+
 ### Added - Real-time Notifications
 - SignalR integration with JWT authentication
 - Waiter joins personal SignalR group on login
@@ -20,6 +36,11 @@
 - Physical products: beer, soda (requires stock tracking)
 - Full CRUD endpoints: GET/POST/PUT/DELETE `/api/products`
 - GetProductsQuery supports filtering by destination
+
+### Fixed
+- Products not showing in waiter menu - added `isActive` default to `true`
+- ProductSearch component properly filters products
+- Edit button now opens modal correctly
 
 ### Security - Environment Variables
 - Created `.env` and `.env.example` for API configuration
@@ -79,26 +100,8 @@
 
 ## Next Steps (Roadmap)
 
-### Authentication System
-- Implement login for managers and waiters
-- **Status**: 0% completed
-- Required for: waiter notifications, role-based access control
-
-### Waiter Notifications (Real-time)
-- Waiter needs to join SignalR group on login
-- Route notifications to specific waiter by ID
-- **Status**: 20% completed (backend sends, frontend displays, needs auth to route)
-
 ### Manager Dashboard
 - Full access to system: manage waiters, inventory, products
-- **Status**: 0% completed
-
-### Inventory Management
-- Track products and stock
-- **Status**: 0% completed
-
-### Product Management  
-- CRUD for menu items and categories
 - **Status**: 0% completed
 
 ---

@@ -1,40 +1,24 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useOrderStore } from '../../stores/orderStore';
 import { getAuthHeaders } from '../../utils/api';
+import { ProductSearch } from './ProductSearch';
+import { ProductList, type Product } from './ProductList';
+import { ProductModal, type ProductFormData } from './ProductModal';
+import { ConfirmModal } from './ConfirmModal';
 import styles from './ProductsView.module.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  category: string;
-  destination: string;
-  productType: string;
-  stockQuantity?: number;
-  emoji?: string;
-  isActive: boolean;
-}
-
-const CATEGORIES = ['Platos', 'Entradas', 'Bebidas'];
-const DESTINATIONS = ['Kitchen', 'Bar'];
-const PRODUCT_TYPES = ['Service', 'Physical'];
 
 export function ProductsView() {
   const { showNotification } = useOrderStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    price: 0,
-    category: 'Platos',
-    destination: 'Kitchen',
-    productType: 'Service',
-    stockQuantity: 0,
-    emoji: '',
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; productId: number | null }>({
+    isOpen: false,
+    productId: null,
   });
 
   const fetchProducts = async () => {
@@ -56,8 +40,17 @@ export function ProductsView() {
     fetchProducts();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm.trim()) return products;
+    const term = searchTerm.toLowerCase();
+    return products.filter(p => 
+      p.name.toLowerCase().includes(term) ||
+      p.category.toLowerCase().includes(term) ||
+      p.destination.toLowerCase().includes(term)
+    );
+  }, [products, searchTerm]);
+
+  const handleSave = async (formData: ProductFormData) => {
     try {
       const url = editingProduct 
         ? `${API_URL}/api/products/${editingProduct.id}`
@@ -77,7 +70,6 @@ export function ProductsView() {
         );
         setIsModalOpen(false);
         setEditingProduct(null);
-        resetForm();
         fetchProducts();
       } else {
         showNotification('Error al guardar producto', 'error');
@@ -87,10 +79,14 @@ export function ProductsView() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Eliminar este producto?')) return;
+  const handleDeleteClick = (id: number) => {
+    setDeleteConfirm({ isOpen: true, productId: id });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm.productId) return;
     try {
-      const response = await fetch(`${API_URL}/api/products/${id}`, {
+      const response = await fetch(`${API_URL}/api/products/${deleteConfirm.productId}`, {
         method: 'DELETE',
         headers: getAuthHeaders(),
       });
@@ -100,39 +96,23 @@ export function ProductsView() {
       }
     } catch (error) {
       showNotification('Error al eliminar producto', 'error');
+    } finally {
+      setDeleteConfirm({ isOpen: false, productId: null });
     }
   };
 
-  const handleEdit = (product: Product) => {
-    setEditingProduct(product);
-    setFormData({
-      name: product.name,
-      price: product.price,
-      category: product.category,
-      destination: product.destination,
-      productType: product.productType,
-      stockQuantity: product.stockQuantity || 0,
-      emoji: product.emoji || '',
-    });
-    setIsModalOpen(true);
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      price: 0,
-      category: 'Platos',
-      destination: 'Kitchen',
-      productType: 'Service',
-      stockQuantity: 0,
-      emoji: '',
-    });
+  const handleDeleteCancel = () => {
+    setDeleteConfirm({ isOpen: false, productId: null });
   };
 
   const openNewModal = () => {
     setEditingProduct(null);
-    resetForm();
     setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingProduct(null);
   };
 
   return (
@@ -144,108 +124,35 @@ export function ProductsView() {
         </button>
       </div>
 
+      <ProductSearch value={searchTerm} onChange={setSearchTerm} />
+
       {isLoading ? (
-        <p>Cargando...</p>
+        <p className={styles.loading}>Cargando...</p>
       ) : (
-        <div className={styles.grid}>
-          {products.map((product) => (
-            <div key={product.id} className={styles.card}>
-              <div className={styles.cardHeader}>
-                <span className={styles.emoji}>{product.emoji || '🍽️'}</span>
-                <span className={styles.name}>{product.name}</span>
-              </div>
-              <div className={styles.cardBody}>
-                <p>Precio: ${product.price.toFixed(2)}</p>
-                <p>Categoría: {product.category}</p>
-                <p>Destino: {product.destination}</p>
-                <p>Tipo: {product.productType}</p>
-                {product.productType === 'Physical' && (
-                  <p>Stock: {product.stockQuantity}</p>
-                )}
-              </div>
-              <div className={styles.cardActions}>
-                <button onClick={() => handleEdit(product)} className={styles.editButton}>
-                  Editar
-                </button>
-                <button onClick={() => handleDelete(product.id)} className={styles.deleteButton}>
-                  Eliminar
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+      <ProductList 
+        products={filteredProducts} 
+        onEdit={(product) => {
+          setEditingProduct(product);
+          setIsModalOpen(true);
+        }}
+        onDelete={handleDeleteClick}
+      />
       )}
 
-      {isModalOpen && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>{editingProduct ? 'Editar' : 'Nuevo'} Producto</h3>
-            <form onSubmit={handleSubmit} className={styles.form}>
-              <input
-                type="text"
-                placeholder="Nombre"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-              <input
-                type="number"
-                placeholder="Precio"
-                value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                required
-                step="0.01"
-              />
-              <input
-                type="text"
-                placeholder="Emoji"
-                value={formData.emoji}
-                onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-              />
-              <select
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-              <select
-                value={formData.destination}
-                onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-              >
-                {DESTINATIONS.map((dest) => (
-                  <option key={dest} value={dest}>{dest}</option>
-                ))}
-              </select>
-              <select
-                value={formData.productType}
-                onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
-              >
-                {PRODUCT_TYPES.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-              {formData.productType === 'Physical' && (
-                <input
-                  type="number"
-                  placeholder="Stock"
-                  value={formData.stockQuantity}
-                  onChange={(e) => setFormData({ ...formData, stockQuantity: parseInt(e.target.value) })}
-                />
-              )}
-              <div className={styles.modalActions}>
-                <button type="button" onClick={() => setIsModalOpen(false)} className={styles.cancelButton}>
-                  Cancelar
-                </button>
-                <button type="submit" className={styles.saveButton}>
-                  Guardar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <ProductModal
+        product={editingProduct}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onSave={handleSave}
+      />
+
+      <ConfirmModal
+        isOpen={deleteConfirm.isOpen}
+        title="Eliminar Producto"
+        message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 }
