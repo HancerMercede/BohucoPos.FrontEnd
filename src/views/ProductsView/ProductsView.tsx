@@ -5,15 +5,18 @@ import { ProductSearch } from './ProductSearch';
 import { ProductList, type Product } from './ProductList';
 import { ProductModal, type ProductFormData } from './ProductModal';
 import { ConfirmModal } from './ConfirmModal';
+import { Pagination } from '../../components/Pagination';
 import styles from './ProductsView.module.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
+const ITEMS_PER_PAGE = 5;
 
 export function ProductsView() {
   const { showNotification } = useOrderStore();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; productId: number | null }>({
@@ -40,6 +43,10 @@ export function ProductsView() {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const filteredProducts = useMemo(() => {
     if (!searchTerm.trim()) return products;
     const term = searchTerm.toLowerCase();
@@ -49,6 +56,12 @@ export function ProductsView() {
       p.destination.toLowerCase().includes(term)
     );
   }, [products, searchTerm]);
+
+  const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+  const paginatedProducts = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProducts, currentPage]);
 
   const handleSave = async (formData: ProductFormData) => {
     try {
@@ -129,14 +142,21 @@ export function ProductsView() {
       {isLoading ? (
         <p className={styles.loading}>Cargando...</p>
       ) : (
-      <ProductList 
-        products={filteredProducts} 
-        onEdit={(product) => {
-          setEditingProduct(product);
-          setIsModalOpen(true);
-        }}
-        onDelete={handleDeleteClick}
-      />
+      <>
+        <ProductList 
+          products={paginatedProducts} 
+          onEdit={(product) => {
+            setEditingProduct(product);
+            setIsModalOpen(true);
+          }}
+          onDelete={handleDeleteClick}
+        />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      </>
       )}
 
       <ProductModal

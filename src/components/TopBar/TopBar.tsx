@@ -10,7 +10,7 @@ export function TopBar({ view, setView }: TopBarProps) {
     logout();
   };
 
-  const visibleTabs = NAV_TABS.filter(tab => {
+  const visibleTabs = NAV_TABS.filter((tab: { id: string }) => {
     if (tab.id === 'products' || tab.id === 'manager') {
       return user?.role === 'Admin';
     }

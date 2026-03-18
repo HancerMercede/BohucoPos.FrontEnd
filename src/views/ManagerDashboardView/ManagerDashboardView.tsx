@@ -1,9 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useOrderStore } from '../../stores/orderStore';
 import { getAuthHeaders } from '../../utils/api';
+import { Pagination } from '../../components/Pagination';
 import styles from './ManagerDashboardView.module.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
+const ITEMS_PER_PAGE = 5;
 
 interface SalesData {
   startDate: string;
@@ -49,15 +50,18 @@ interface LowInventoryItem {
 type TimeRange = 'today' | 'week' | 'month';
 
 export function ManagerDashboardView() {
-  const { showNotification } = useOrderStore();
   const [salesData, setSalesData] = useState<SalesData | null>(null);
   const [lowInventory, setLowInventory] = useState<LowInventoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>('week');
   const [activeSection, setActiveSection] = useState<'sales' | 'inventory'>('sales');
+  const [productsPage, setProductsPage] = useState(1);
+  const [waitersPage, setWaitersPage] = useState(1);
 
   const fetchSalesData = async (range: TimeRange) => {
     setIsLoading(true);
+    setProductsPage(1);
+    setWaitersPage(1);
     try {
       let startDate: string;
       const endDate = new Date().toISOString();
@@ -120,10 +124,20 @@ export function ManagerDashboardView() {
     ];
   }, [salesData, lowInventory]);
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
-  };
+  const paginatedProducts = useMemo(() => {
+    if (!salesData?.topProducts) return [];
+    const start = (productsPage - 1) * ITEMS_PER_PAGE;
+    return salesData.topProducts.slice(start, start + ITEMS_PER_PAGE);
+  }, [salesData?.topProducts, productsPage]);
+
+  const paginatedWaiters = useMemo(() => {
+    if (!salesData?.waiterPerformance) return [];
+    const start = (waitersPage - 1) * ITEMS_PER_PAGE;
+    return salesData.waiterPerformance.slice(start, start + ITEMS_PER_PAGE);
+  }, [salesData?.waiterPerformance, waitersPage]);
+
+  const productsTotalPages = Math.ceil((salesData?.topProducts?.length || 0) / ITEMS_PER_PAGE);
+  const waitersTotalPages = Math.ceil((salesData?.waiterPerformance?.length || 0) / ITEMS_PER_PAGE);
 
   return (
     <div className={styles.container}>
@@ -189,12 +203,12 @@ export function ManagerDashboardView() {
               <div className={styles.card}>
                 <h3 className={styles.cardTitle}>Productos Más Vendidos</h3>
                 <div className={styles.productList}>
-                  {salesData.topProducts.length === 0 ? (
+                  {paginatedProducts.length === 0 ? (
                     <p className={styles.empty}>No hay datos</p>
                   ) : (
-                    salesData.topProducts.map((product, i) => (
+                    paginatedProducts.map((product, i) => (
                       <div key={product.productName} className={styles.productItem}>
-                        <span className={styles.rank}>#{i + 1}</span>
+                        <span className={styles.rank}>#{((productsPage - 1) * ITEMS_PER_PAGE) + i + 1}</span>
                         <span className={styles.productName}>{product.productName}</span>
                         <span className={styles.productQty}>{product.quantitySold} uds</span>
                         <span className={styles.productRevenue}>${product.revenue.toFixed(2)}</span>
@@ -202,15 +216,20 @@ export function ManagerDashboardView() {
                     ))
                   )}
                 </div>
+                <Pagination
+                  currentPage={productsPage}
+                  totalPages={productsTotalPages}
+                  onPageChange={setProductsPage}
+                />
               </div>
 
               <div className={styles.card}>
                 <h3 className={styles.cardTitle}>Rendimiento de Meseros</h3>
                 <div className={styles.waiterList}>
-                  {salesData.waiterPerformance.length === 0 ? (
+                  {paginatedWaiters.length === 0 ? (
                     <p className={styles.empty}>No hay datos</p>
                   ) : (
-                    salesData.waiterPerformance.map((waiter) => (
+                    paginatedWaiters.map((waiter) => (
                       <div key={waiter.waiterName} className={styles.waiterItem}>
                         <span className={styles.waiterName}>
                           {waiter.waiterName.includes('@') 
@@ -223,6 +242,11 @@ export function ManagerDashboardView() {
                     ))
                   )}
                 </div>
+                <Pagination
+                  currentPage={waitersPage}
+                  totalPages={waitersTotalPages}
+                  onPageChange={setWaitersPage}
+                />
               </div>
 
               <div className={styles.card}>
