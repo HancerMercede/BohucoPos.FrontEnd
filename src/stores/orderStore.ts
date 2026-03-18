@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import * as signalR from '@microsoft/signalr';
-import type { TableItem, CartItem, Order, MenuItem, MenuCategory, ItemDestination, Tab, PaymentMethod } from '../types';
+import type { TableItem, Order, MenuItem, MenuCategory, ItemDestination, Tab, PaymentMethod } from '../types';
 import { getAuthHeaders } from '../utils/api';
 import { useAuthStore } from './authStore';
 import { useNotificationStore } from './notificationStore';
+import { useCartStore } from './cartStore';
 import { ERROR_MESSAGES } from '../constants/messages';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
@@ -63,7 +64,6 @@ const defaultTables: TableItem[] = [
 
 interface OrderStore {
   tables: TableItem[];
-  cart: CartItem[];
   orders: Order[];
   products: MenuItem[];
   selectedTable: TableItem | null;
@@ -105,7 +105,6 @@ interface OrderStore {
 
 export const useOrderStore = create<OrderStore>((set, get) => ({
   tables: defaultTables,
-  cart: [],
   orders: [],
   products: [],
   selectedTable: null,
@@ -150,7 +149,8 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
     if (tableTabs.length > 0) {
       set({ selectedTable: table, tabs: tableTabs });
     } else {
-      set({ selectedTable: table, cart: [] });
+      useCartStore.getState().clearCart();
+      set({ selectedTable: table });
     }
   },
   
@@ -159,51 +159,31 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
   },
   
   goToMenu: (table) => {
-    set({ selectedTable: table, waiterStep: 'menu', cart: [] });
+    useCartStore.getState().clearCart();
+    set({ selectedTable: table, waiterStep: 'menu' });
   },
   
-  goBackToTables: () => set({ selectedTable: null, waiterStep: 'tables', selectedTab: null, cart: [] }),
+  goBackToTables: () => {
+    useCartStore.getState().clearCart();
+    set({ selectedTable: null, waiterStep: 'tables', selectedTab: null });
+  },
   
   setSelectedTab: (tab) => set({ selectedTab: tab }),
   
-  addToCart: (item) => {
-    const { cart } = get();
-    const existing = cart.find(c => c.id === item.id);
-    if (existing) {
-      set({ cart: cart.map(c => c.id === item.id ? { ...c, qty: c.qty + 1 } : c) });
-    } else {
-      set({ cart: [...cart, { ...item, qty: 1, notes: '' }] });
-    }
+  addToCart: (item) => useCartStore.getState().addToCart(item),
+  updateCartQty: (id, delta) => useCartStore.getState().updateCartQty(id, delta),
+  updateCartNote: (id, notes) => useCartStore.getState().updateCartNote(id, notes),
+  removeFromCart: (id) => useCartStore.getState().removeFromCart(id),
+  clearCart: () => {
+    useCartStore.getState().clearCart();
+    set({ sent: false, selectedTable: null, waiterStep: 'tables' });
   },
-
-  updateCartQty: (id, delta) => {
-    set((state) => ({
-      cart: state.cart.map(c => {
-        if (c.id === id) {
-          const newQty = c.qty + delta;
-          return newQty > 0 ? { ...c, qty: newQty } : c;
-        }
-        return c;
-      }).filter(c => c.qty > 0)
-    }));
-  },
-
-  updateCartNote: (id, notes) => {
-    set((state) => ({
-      cart: state.cart.map(c => c.id === id ? { ...c, notes } : c)
-    }));
-  },
-
-  removeFromCart: (id) => {
-    set((state) => ({ cart: state.cart.filter(c => c.id !== id) }));
-  },
-
-  clearCart: () => set({ cart: [], sent: false, selectedTable: null, waiterStep: 'tables' }),
 
   setCategory: (cat) => set({ category: cat }),
 
   submitOrder: async (waiterName) => {
-    const { cart, selectedTable, selectedTab } = get();
+    const cart = useCartStore.getState().cart;
+    const { selectedTable, selectedTab } = get();
     if (cart.length === 0) return;
 
     const orderType = selectedTable?.type === 'bar' ? 1 : 0;
@@ -217,7 +197,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
           orderType,
           tableId: selectedTable?.id || null,
           waiterName,
-          items: cart.map(item => ({
+          items: cart.map((item) => ({
             productId: item.id,
             productName: item.name,
             unitPrice: item.price,
@@ -243,7 +223,8 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
         
         set({ sent: true });
         setTimeout(() => {
-          set({ cart: [], sent: false, selectedTable: null, waiterStep: 'tables', selectedTab: null });
+          useCartStore.getState().clearCart();
+          set({ sent: false, selectedTable: null, waiterStep: 'tables', selectedTab: null });
         }, 2300);
       } else {
         const errorText = await response.text();
@@ -515,7 +496,8 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
           }
         }
         
-        set({ selectedTab: null, waiterStep: 'tables', selectedTable: null, cart: [] });
+        useCartStore.getState().clearCart();
+        set({ selectedTab: null, waiterStep: 'tables', selectedTable: null });
       }
     } catch (error) {
       console.error('Failed to close tab:', error);
