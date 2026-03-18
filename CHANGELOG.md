@@ -98,11 +98,31 @@
 
 ---
 
-## Next Steps (Roadmap)
+## [1.4.0] - 2026-03-18
 
-### Manager Dashboard
-- Full access to system: manage waiters, inventory, products
-- **Status**: 0% completed
+### Added - Manager Dashboard (Admin)
+- Sales analytics view with date range filtering
+- Low inventory alerts showing products below threshold
+- Total sales, order counts, and category breakdown
+- Pagination (5 items per page) using lucide-react Pagination component
+
+### Added - Pagination Component
+- Reusable Pagination component with CSS Module
+- Props: currentPage, totalPages, onPageChange
+- First, previous, next, last buttons with page numbers
+
+### Added - PDF Bill with Authentication
+- PDF request now includes JWT authentication headers
+- Uses getAuthHeaders() for authenticated requests
+
+### Fixed - Sales Calculation
+- GetClosedTabsWithOrdersAsync now loads orders with tabs
+- Tab.Total now correctly calculates from loaded orders
+
+### Added - Role-based Default View
+- Admin defaults to "Gerente" tab
+- Waiter defaults to "Mesero" tab
+- Navigation adapts based on user role
 
 ---
 

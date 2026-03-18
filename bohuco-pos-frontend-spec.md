@@ -947,7 +947,7 @@ export type ItemDestination = 'Kitchen' | 'Bar'
 
 export type TableStatus = 'free' | 'occupied'
 
-export type ViewId = 'waiter' | 'kitchen' | 'bar' | 'overview'
+export type ViewId = 'waiter' | 'kitchen' | 'bar' | 'overview' | 'products' | 'manager'
 
 export type WaiterStep = 'tables' | 'menu'
 
@@ -1327,4 +1327,155 @@ import { WaiterView } from '@/views/WaiterView'
 
 ---
 
-*Versión 1.1 — Bohuco POS Frontend Spec — 2026*
+## 15. Authentication & User Management
+
+### User Type (src/types/index.ts)
+```ts
+export type UserRole = 'Waiter' | 'Kitchen' | 'Bar' | 'Admin'
+
+export interface User {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  role: UserRole
+}
+```
+
+### Auth Store (src/stores/authStore.ts)
+- JWT token management with localStorage persistence
+- User info storage with role-based access
+- Login/Logout actions
+- Protected route checks
+
+### Login/Register Flow
+- Login page with email/password
+- Register page with role selection
+- JWT token returned on successful auth
+- Automatic redirect to role-appropriate view
+
+---
+
+## 16. Products View (Admin Only)
+
+### Route: `/productos`
+- Accessible only to Admin role
+- Full CRUD operations for menu products
+- Product fields: name, price, category, destination (Kitchen/Bar), emoji
+- Features:
+  - Search functionality
+  - Pagination (5 items per page)
+  - Add product modal
+  - Edit product modal
+  - Delete confirmation modal
+
+### Components
+- ProductSearch - Search input with filtering
+- ProductList - Grid display with edit/delete actions
+- ProductModal - Form for add/edit operations
+- ConfirmModal - Delete confirmation dialog
+
+---
+
+## 17. Manager Dashboard (Admin Only)
+
+### Route: `/gerente`
+- Accessible only to Admin role
+- Sales analytics dashboard
+- Features:
+  - Date range filter for sales
+  - Low inventory alerts
+  - Sales statistics cards
+  - Pagination (5 items per page)
+
+### API Integration
+- `GET /api/dashboard/sales?startDate=&endDate=` - Sales data
+- `GET /api/dashboard/low-inventory` - Products with low stock
+
+---
+
+## 18. Role-Based Navigation
+
+### NAV_TABS (src/constants/design.ts)
+```ts
+export const NAV_TABS = [
+  { id: 'waiter',   icon: '🧾', label: 'Mesero'    },
+  { id: 'kitchen',  icon: '🍳', label: 'Cocina'    },
+  { id: 'bar',      icon: '🍹', label: 'Barra'     },
+  { id: 'overview', icon: '📊', label: 'Resumen'   },
+  { id: 'products', icon: '📦', label: 'Productos' }, // Admin only
+  { id: 'manager',  icon: '📈', label: 'Gerente'  }, // Admin only
+] as const
+```
+
+### Visibility Rules
+| Role | Visible Tabs |
+|------|--------------|
+| Admin | All 6 tabs |
+| Waiter | Mesero, Cocina, Barra, Resumen |
+| Kitchen | Cocina |
+| Bar | Barra |
+
+### Default View by Role
+- Admin → 'manager' (Gerente)
+- Waiter → 'waiter' (Mesero)
+- Kitchen → 'kitchen'
+- Bar → 'bar'
+
+---
+
+## 19. SignalR Integration with JWT
+
+### Connection
+```
+/hubs/orders?token=<jwt_token>
+```
+
+### Waiter Group Join
+```ts
+// On login, waiter joins their personal group
+hubConnection.invoke('JoinWaiterGroup', user.firstName)
+```
+
+### Notifications
+- Kitchen/Bar updates item status → broadcasts to waiter's group
+- Waiter receives toast notification with item details
+- Notification includes: item name, new status, order info
+
+---
+
+## 20. PDF Bill Generation
+
+### Endpoint
+- `GET /api/pdf/bill/{tabId}` - Returns PDF document
+
+### Frontend Implementation
+- TabDetailModal shows PDF in iframe when bill is requested
+- Uses getAuthHeaders() for authenticated requests
+- Professional thermal ticket format (80mm width)
+
+---
+
+## 21. Pagination Component
+
+### Component: src/components/Pagination/
+- Pagination.tsx - Main component
+- Pagination.module.css - Styles
+
+### Props
+```ts
+interface PaginationProps {
+  currentPage: number
+  totalPages: number
+  onPageChange: (page: number) => void
+}
+```
+
+### Features
+- First/Previous/Next/Last buttons
+- Page number display
+- Disabled states for boundary pages
+
+---
+
+*Versión 1.2 — Bohuco POS Frontend Spec — 2026*
