@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Added - Testing Infrastructure
+- Vitest test runner with React Testing Library
+- Test setup file (`src/test/setup.ts`) with jest-dom
+- Test scripts: `npm test`, `npm run test:run`, `npm run test:ui`
+- Store tests in `src/tests/stores/`:
+  - cartStore.test.ts: 11 tests (addToCart, updateCartQty, removeFromCart, clearCart)
+  - authStore.test.ts: 6 tests (login, logout, defaultView)
+- Fixed cartStore bug where decrementing to qty 0 didn't remove item
+- Total: 17 frontend tests
+
 ### Added - Authentication System
 - Login/Register page with JWT authentication
 - Auth store with token persistence in localStorage
