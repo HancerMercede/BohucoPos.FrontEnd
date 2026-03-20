@@ -268,6 +268,36 @@ Current version: **1.3.0**
 
 See [CHANGELOG.md](CHANGELOG.md) for version history.
 
+## Testing
+
+### Backend Testing
+- **Framework**: xUnit with Moq + FluentAssertions
+- **Location**: `NexusPOS.Tests/` in backend solution
+- **Tests**: 89 unit tests for all domain entities
+  - TabTests: 31 tests (business logic)
+  - OrderTests: 19 tests (business logic)
+  - OrderItemTests: 14 tests (properties)
+  - ProductTests: 16 tests (properties)
+  - UserTests: 9 tests (properties)
+
+Run tests:
+```bash
+dotnet test NexusPOS.Tests
+```
+
+### Frontend Testing
+- **Framework**: Vitest + React Testing Library
+- **Location**: `src/tests/` folder
+- **Tests**: 17 tests for stores
+  - `src/tests/stores/cartStore.test.ts`: 11 tests
+  - `src/tests/stores/authStore.test.ts`: 6 tests
+
+Run tests:
+```bash
+npm run test       # Watch mode
+npm run test:run   # Single run
+```
+
 ## License
 
 Proprietary - BOHUCO Restaurant

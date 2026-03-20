@@ -33,11 +33,11 @@ export const useCartStore = create<CartStore>((set, get) => ({
         .map((c) => {
           if (c.id === id) {
             const newQty = c.qty + delta;
-            return newQty > 0 ? { ...c, qty: newQty } : c;
+            return newQty > 0 ? { ...c, qty: newQty } : null;
           }
           return c;
         })
-        .filter((c) => c.qty > 0),
+        .filter((c): c is CartItem => c !== null && c.qty > 0),
     }));
   },
 
