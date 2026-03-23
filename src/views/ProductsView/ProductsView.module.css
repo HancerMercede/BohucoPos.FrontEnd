@@ -1,0 +1,47 @@
+.container {
+  padding: 20px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.title {
+  color: #fff;
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  font-family: 'Syne', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.addButton {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: 'Outfit', sans-serif;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.addButton:hover {
+  opacity: 0.9;
+}
+
+.addButton:active {
+  transform: scale(0.98);
+}
+
+.loading {
+  color: rgba(255, 255, 255, 0.6);
+  text-align: center;
+  padding: 40px;
+}

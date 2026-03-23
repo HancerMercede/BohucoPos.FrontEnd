@@ -1,5 +1,76 @@
 # Changelog - BOHUCO POS Frontend
 
+## [Unreleased]
+
+### Added - Testing Infrastructure
+- Vitest test runner with React Testing Library
+- Test setup file (`src/test/setup.ts`) with jest-dom
+- Test scripts: `npm test`, `npm run test:run`, `npm run test:ui`
+- Store tests in `src/tests/stores/`:
+  - cartStore.test.ts: 11 tests (addToCart, updateCartQty, removeFromCart, clearCart)
+  - authStore.test.ts: 6 tests (login, logout, defaultView)
+- Fixed cartStore bug where decrementing to qty 0 didn't remove item
+- Total: 17 frontend tests
+
+### Added - Authentication System
+- Login/Register page with JWT authentication
+- Auth store with token persistence in localStorage
+- Logout button and user name display in TopBar
+- Protected routes - must login to access app
+
+### Added - Role-based Access Control
+- Products tab visible only to Admin role
+- JWT authentication required for all API endpoints
+- User roles: Waiter, Kitchen, Bar, Admin
+
+### Added - ProductsView (Admin)
+- Full CRUD for products (create, read, update, delete)
+- List view with search functionality
+- Custom delete confirmation modal
+- Products managed via API (`/api/products`)
+- Refactored into clean components:
+  - ProductSearch - search input
+  - ProductList - product list display
+  - ProductModal - add/edit form
+  - ConfirmModal - delete confirmation
+
+### Added - Real-time Notifications
+- SignalR integration with JWT authentication
+- Waiter joins personal SignalR group on login
+- Toast notifications when kitchen/bar changes order item status
+- Notifications routed to correct waiter by username
+
+### Added - Backend Product CRUD System
+- Product entity with ProductType enum (Service/Physical)
+- Service products: prepared items like Mojitos, Pizzas (no inventory)
+- Physical products: beer, soda (requires stock tracking)
+- Full CRUD endpoints: GET/POST/PUT/DELETE `/api/products`
+- GetProductsQuery supports filtering by destination
+
+### Fixed
+- Products not showing in waiter menu - added `isActive` default to `true`
+- ProductSearch component properly filters products
+- Edit button now opens modal correctly
+
+### Security - Environment Variables
+- Created `.env` and `.env.example` for API configuration
+- Hardcoded URLs replaced with environment variables (`VITE_API_URL`, `VITE_SIGNALR_URL`)
+- Added `.env` to `.gitignore` to prevent committing secrets
+- Updated orderStore and TabDetailModal to use environment variables
+
+### Backend Refactoring
+- Moved OrderCreatedEventHandler from API to Application layer (correct CQRS placement)
+- Refactored repositories to use primary constructor `context` parameter (removed `_context` field)
+- Created ServiceExtensions class with Configure* methods to organize DI configuration
+- **Breaking**: Removed manual sequence logic - now uses EF Core auto-increment for Order/OrderItem IDs
+
+### Fixed - Backend
+- ProductsController GetById now returns single item (not collection)
+- RepositoryBase simplified - removed redundant `_context` field
+- Fixed syntax error in AppDbContext (extra parenthesis in HasConversion)
+
+---
+
 ## [1.3.0] - 2026-03-11
 
 ### Added - PDF Bill Generation
@@ -21,6 +92,47 @@
 - "Pedir Cuenta" button is disabled after clicking
 - Button text changes to "Cuenta Solicitada" with gray styling
 - Prevents error when clicking button multiple times
+
+### Added - Cancel Items from Tab
+- Add remove button (X) to each item in TabDetailModal
+- Click removes item from order and updates totals
+- Cancelled items hidden in PDF receipt
+- Cancelled items excluded from kitchen/bar displays
+
+### Fixed - Waiter Notifications
+- Backend now uses INotificationService to notify waiters via SignalR
+- When kitchen/bar updates item status, waiter receives real-time notification
+- Notification includes item ID, status, and product name
+- Added in-app toast notification component for waiter
+- **Note**: Feature pending authentication system - waiter needs to be identified to receive personalized notifications
+
+---
+
+## [1.4.0] - 2026-03-18
+
+### Added - Manager Dashboard (Admin)
+- Sales analytics view with date range filtering
+- Low inventory alerts showing products below threshold
+- Total sales, order counts, and category breakdown
+- Pagination (5 items per page) using lucide-react Pagination component
+
+### Added - Pagination Component
+- Reusable Pagination component with CSS Module
+- Props: currentPage, totalPages, onPageChange
+- First, previous, next, last buttons with page numbers
+
+### Added - PDF Bill with Authentication
+- PDF request now includes JWT authentication headers
+- Uses getAuthHeaders() for authenticated requests
+
+### Fixed - Sales Calculation
+- GetClosedTabsWithOrdersAsync now loads orders with tabs
+- Tab.Total now correctly calculates from loaded orders
+
+### Added - Role-based Default View
+- Admin defaults to "Gerente" tab
+- Waiter defaults to "Mesero" tab
+- Navigation adapts based on user role
 
 ---
 

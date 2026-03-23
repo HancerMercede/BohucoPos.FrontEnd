@@ -1,0 +1,1 @@
+export { ManagerDashboardView } from './ManagerDashboardView';

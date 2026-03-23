@@ -18,6 +18,26 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 28px;
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .inner {
+    padding: 0 12px;
+    gap: 8px;
+  }
+  
+  .badgeLabel {
+    display: none;
+  }
+  
+  .logoText {
+    font-size: 16px;
+  }
+  
+  .signalText {
+    display: none;
+  }
 }
 
 .leftSection {
@@ -73,12 +93,35 @@
   background: rgba(0,0,0,.25);
   border-radius: 14px;
   padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabsWrapper::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .tabsWrapper {
+    max-width: 50vw;
+  }
 }
 
 .rightSection {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .userName {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .signalDot {
@@ -94,4 +137,30 @@
   font-size: 12px;
   color: rgba(255,255,255,.38);
   font-weight: 500;
+}
+
+.userName {
+  font-size: 13px;
+  color: #fff;
+  font-weight: 500;
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+}
+
+.logoutBtn {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logoutBtn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.25);
 }

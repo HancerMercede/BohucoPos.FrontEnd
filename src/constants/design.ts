@@ -1,4 +1,4 @@
-import type { StatusStyle } from '../types'
+import type { StatusStyle, ViewId } from '../types'
 
 export const FONTS = {
   display: "'Syne', sans-serif",
@@ -77,9 +77,11 @@ export const DISPLAY_CONFIG = {
   },
 } as const
 
-export const NAV_TABS = [
+export const NAV_TABS: { id: ViewId; icon: string; label: string }[] = [
   { id: 'waiter',   icon: '🧾', label: 'Mesero'  },
   { id: 'kitchen',  icon: '🍳', label: 'Cocina'  },
   { id: 'bar',      icon: '🍹', label: 'Barra'   },
   { id: 'overview', icon: '📊', label: 'Resumen' },
-] as const
+  { id: 'manager',  icon: '⚙️', label: 'Gerente' },
+  { id: 'products', icon: '📦', label: 'Productos' },
+]

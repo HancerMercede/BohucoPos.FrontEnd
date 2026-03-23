@@ -2,11 +2,11 @@
 
 export type OrderType      = 'Table' | 'Bar' | 'TakeAway' | 'Delivery'
 export type OrderStatus    = 'Pending' | 'InProgress' | 'Ready' | 'Delivered' | 'Cancelled'
-export type ItemStatus     = 'Pending' | 'Preparing' | 'Ready' | 'Delivered'
+export type ItemStatus     = 'Pending' | 'Preparing' | 'Ready' | 'Delivered' | 'Cancelled'
 export type ItemDestination= 'Kitchen' | 'Bar'
 export type TableStatus    = 'free' | 'occupied' | 'pending' | 'has-tabs'
 export type TableType      = 'table' | 'bar'
-export type ViewId         = 'waiter' | 'kitchen' | 'bar' | 'overview'
+export type ViewId         = 'waiter' | 'kitchen' | 'bar' | 'overview' | 'manager' | 'products'
 export type WaiterStep     = 'tables' | 'menu' | 'tabs'
 export type MenuCategory   = 'Todos' | 'Platos' | 'Entradas' | 'Bebidas'
 export type TabStatus      = 'OPEN' | 'PENDING' | 'CLOSED' | 'CANCELLED' | 'Open' | 'Pending' | 'Closed' | 'Cancelled'

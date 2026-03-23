@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useState } from 'react';
 import { useOrderStore } from '../../stores/orderStore';
 import { Badge } from '../../components/Badge';
 import { DISPLAY_CONFIG, NEXT_STATUS, ACTION_LABELS } from '../../constants/design';
@@ -14,6 +14,8 @@ export function DisplayView({ dest }: DisplayViewProps) {
     fetchPendingOrders(dest, true);
   }, [dest, fetchPendingOrders, loadSignalR]);
 
+  const [cancelledItems, setCancelledItems] = useState<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+
   const filteredOrders = useMemo(() => orders
     .map(o => ({ 
       ...o, 
@@ -25,6 +27,30 @@ export function DisplayView({ dest }: DisplayViewProps) {
       }) || [] 
     }))
     .filter(o => o.items?.length > 0), [orders, dest]);
+
+  const ordersWithCancelled = useMemo(() => {
+    return filteredOrders.map(o => ({
+      ...o,
+      items: o.items?.map(i => {
+        if (i.status === 'Cancelled' && !cancelledItems.has(i.id)) {
+          const timeout = setTimeout(() => {
+            setCancelledItems(prev => {
+              const next = new Map(prev);
+              next.delete(i.id);
+              return next;
+            });
+          }, 10000);
+          setCancelledItems(prev => new Map(prev).set(i.id, timeout));
+        }
+        return i;
+      }).filter(i => {
+        if (i.status === 'Cancelled') {
+          return cancelledItems.has(i.id);
+        }
+        return true;
+      })
+    })).filter(o => o.items?.length > 0);
+  }, [filteredOrders, cancelledItems]);
 
   const updateStatus = useCallback((orderId: string | number, itemId: number, newStatus: ItemStatus) => {
     updateOrderItemStatus(String(orderId), itemId, newStatus);
@@ -49,14 +75,14 @@ export function DisplayView({ dest }: DisplayViewProps) {
         </div>
         <div className={styles.activeCount}>
           <span className={styles.activeCountValue} style={{ color: config.accentColor }}>
-            {filteredOrders.length}
+            {ordersWithCancelled.length}
           </span>
           <span className={styles.activeCountLabel}>órdenes activas</span>
         </div>
       </div>
 
       <div className={styles.grid}>
-        {filteredOrders.map((order, oi) => {
+        {ordersWithCancelled.map((order, oi) => {
           const orderItems = order.items || [];
           const allDone = orderItems.every(i => i.status === 'Ready' || i.status === 'Delivered');
           const createdAt = order.createdAt ? new Date(order.createdAt) : new Date();
@@ -99,12 +125,18 @@ export function DisplayView({ dest }: DisplayViewProps) {
                   const borderColor = statusKey === 'Pending' ? 'rgba(249,115,22,0.40)' :
                                      statusKey === 'Preparing' ? 'rgba(59,130,246,0.40)' :
                                      statusKey === 'Ready' ? 'rgba(16,185,129,0.40)' :
+                                     statusKey === 'Cancelled' ? 'rgba(239,68,68,0.60)' :
                                      'rgba(255,255,255,0.10)';
+                  const isCancelled = statusKey === 'Cancelled';
                   return (
                     <div
                       key={item.id}
                       className={styles.itemCard}
-                      style={{ borderColor }}
+                      style={{ 
+                        borderColor,
+                        background: isCancelled ? 'rgba(239,68,68,0.08)' : undefined,
+                        opacity: isCancelled ? 0.7 : undefined
+                      }}
                     >
                       <div className={styles.itemRow} style={{ marginBottom: item.notes ? 4 : 8 }}>
                         <span className={styles.itemText}>
@@ -117,7 +149,7 @@ export function DisplayView({ dest }: DisplayViewProps) {
                           📝 {item.notes}
                         </div>
                       )}
-                      {item.status !== 'Delivered' && (
+                      {item.status !== 'Delivered' && item.status !== 'Cancelled' && (
                         <button
                           className="abtn"
                           onClick={() => {
