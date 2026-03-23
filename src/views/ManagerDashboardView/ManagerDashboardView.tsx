@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getAuthHeaders } from '../../utils/api';
 import { Pagination } from '../../components/Pagination';
+import { API_URL } from '../../config';
 import styles from './ManagerDashboardView.module.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
 const ITEMS_PER_PAGE = 5;
 
 interface SalesData {

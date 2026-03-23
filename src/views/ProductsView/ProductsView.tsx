@@ -7,9 +7,9 @@ import { ProductList, type Product } from './ProductList';
 import { ProductModal, type ProductFormData } from './ProductModal';
 import { ConfirmModal } from './ConfirmModal';
 import { Pagination } from '../../components/Pagination';
+import { API_URL } from '../../config';
 import styles from './ProductsView.module.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
 const ITEMS_PER_PAGE = 5;
 
 export function ProductsView() {

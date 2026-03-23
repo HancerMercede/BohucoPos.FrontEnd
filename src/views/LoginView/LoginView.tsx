@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '../../stores/authStore';
+import { API_URL } from '../../config';
 import styles from './LoginView.module.css';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
 
 export function LoginView() {
   const [isRegister, setIsRegister] = useState(false);

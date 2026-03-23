@@ -4,9 +4,8 @@ import { DestTag } from '../../../components/DestTag'
 import { getAuthHeaders } from '../../../utils/api'
 import { useState } from 'react'
 import { useOrderStore } from '../../../stores/orderStore'
+import { API_URL } from '../../../config'
 import styles from './TabDetailModal.module.css'
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
 
 function OrderBlock({ order, index }: { order: Order; index: number }) {
   const cancelItem = useOrderStore(s => s.cancelItem)
