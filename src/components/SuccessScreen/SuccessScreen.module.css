@@ -7,6 +7,8 @@
   gap: 20px;
   position: relative;
   z-index: 1;
+  padding: 20px;
+  text-align: center;
 }
 
 .icon {
@@ -22,4 +24,19 @@
   color: #10B981;
   animation: success-pop 0.5s ease both;
   box-shadow: 0 0 48px rgba(16,185,129,.32);
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .container {
+    height: 60vh;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .icon {
+    width: 72px;
+    height: 72px;
+    font-size: 32px;
+  }
 }

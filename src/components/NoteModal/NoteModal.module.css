@@ -16,6 +16,32 @@
   padding: 28px;
   width: 305px;
   box-shadow: 0 36px 80px rgba(0,0,0,.55);
+  max-width: 90vw;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .modal {
+    padding: 20px;
+    width: 95%;
+    border-radius: 16px;
+  }
+  
+  .input {
+    height: 80px;
+    font-size: 14px;
+  }
+  
+  .buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .cancelBtn,
+  .saveBtn {
+    padding: 12px;
+    min-height: 44px;
+  }
 }
 
 .input {

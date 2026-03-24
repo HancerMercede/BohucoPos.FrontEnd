@@ -15,6 +15,87 @@
   transition: all 0.2s;
 }
 
+/* Tablet */
+@media (max-width: 768px) {
+  .item {
+    flex-wrap: wrap;
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .emoji {
+    font-size: 24px;
+    width: auto;
+  }
+  
+  .info {
+    flex: 1 1 60%;
+  }
+  
+  .name {
+    font-size: 0.95rem;
+  }
+  
+  .meta {
+    font-size: 0.75rem;
+  }
+  
+  .price {
+    font-size: 1rem;
+    min-width: auto;
+  }
+  
+  .status {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    min-width: 60px;
+  }
+  
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .editButton, .deleteButton {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    min-height: 44px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .item {
+    padding: 10px;
+    gap: 8px;
+  }
+  
+  .info {
+    flex: 1 1 50%;
+  }
+  
+  .price {
+    font-size: 0.95rem;
+    order: 3;
+    text-align: left;
+    width: 100%;
+    margin-top: 4px;
+  }
+  
+  .status {
+    order: 4;
+  }
+  
+  .actions {
+    order: 5;
+    width: 100%;
+  }
+  
+  .editButton, .deleteButton {
+    flex: 1;
+  }
+}
+
 .item:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2);

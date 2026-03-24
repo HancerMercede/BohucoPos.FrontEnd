@@ -3,6 +3,8 @@
   top: 0;
   z-index: 100;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
   height: 58px;
   background: rgba(10,15,30,0.70);
   backdrop-filter: blur(32px);
@@ -12,6 +14,7 @@
 
 .inner {
   max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
   height: 100%;
   display: flex;
@@ -19,6 +22,7 @@
   justify-content: space-between;
   padding: 0 28px;
   gap: 16px;
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
@@ -37,6 +41,42 @@
   
   .signalText {
     display: none;
+  }
+  
+  .nav {
+    height: 52px;
+  }
+  
+  .separator {
+    display: none;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 400px) {
+  .logo {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+  
+  .logoText {
+    font-size: 14px;
+  }
+  
+  .logoAccent {
+    display: none;
+  }
+  
+  .userName {
+    max-width: 60px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  
+  .logoutBtn {
+    padding: 4px 8px;
+    font-size: 10px;
   }
 }
 
@@ -70,6 +110,14 @@
 .logoAccent {
   color: rgba(255,255,255,.38);
   font-weight: 600;
+}
+
+/* Hide text on mobile, show only icon */
+@media (max-width: 600px) {
+  .logoText,
+  .logoAccent {
+    display: none;
+  }
 }
 
 .separator {

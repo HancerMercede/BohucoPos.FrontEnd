@@ -52,7 +52,79 @@
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 18px;
-  max-width: 900px;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Tablet Landscape */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+}
+
+/* Tablet Portrait */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  
+  .wrapper {
+    padding: 16px;
+  }
+  
+  .title {
+    font-size: 22px;
+  }
+  
+  .card {
+    padding: 20px 12px;
+    min-height: 100px;
+  }
+  
+  .icon {
+    font-size: 28px;
+  }
+  
+  .name {
+    font-size: 14px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .card {
+    padding: 16px 10px;
+    min-height: 90px;
+    border-radius: 14px;
+  }
+  
+  .icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  
+  .name {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .statusLabel {
+    font-size: 10px;
+  }
+  
+  .tabCount {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
 }
 
 .card {
