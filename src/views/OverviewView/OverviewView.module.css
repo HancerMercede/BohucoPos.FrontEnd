@@ -2,6 +2,8 @@
   padding: 32px;
   position: relative;
   z-index: 1;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .headerWrapper {
@@ -27,6 +29,63 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   margin-bottom: 28px;
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .statValue {
+    font-size: 28px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 500px) {
+  .container {
+    padding: 16px;
+  }
+  
+  .headerWrapper {
+    margin-bottom: 16px;
+  }
+  
+  .pageTitle {
+    font-size: 20px;
+  }
+  
+  .pageSubtitle {
+    font-size: 11px;
+  }
+  
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  
+  .statCard {
+    padding: 16px;
+    border-radius: 14px;
+  }
+  
+  .statIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .statValue {
+    font-size: 22px;
+  }
+  
+  .statLabel {
+    font-size: 10px;
+  }
 }
 
 .statCard {
@@ -117,6 +176,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  display: table;
 }
 
 .tableHead {
@@ -186,4 +246,60 @@
 
 .timeUrgent {
   color: #EF4444;
+}
+
+/* Mobile Table */
+@media (max-width: 500px) {
+  .tableContainer {
+    border-radius: 14px;
+    overflow-x: auto;
+  }
+  
+  .tableHeader {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .tableTitle {
+    font-size: 14px;
+  }
+  
+  .table {
+    min-width: 600px;
+  }
+  
+  .tableTh {
+    padding: 8px 12px;
+    font-size: 9px;
+  }
+  
+  .tableCell {
+    padding: 10px 12px;
+  }
+  
+  .cellId {
+    font-size: 10px;
+  }
+  
+  .cellTable {
+    font-size: 11px;
+  }
+  
+  .cellWaiter {
+    font-size: 11px;
+  }
+  
+  .cellItems {
+    font-size: 12px;
+  }
+  
+  .cellKitchen,
+  .cellBar {
+    font-size: 10px;
+  }
+  
+  .cellTime {
+    font-size: 11px;
+  }
 }
