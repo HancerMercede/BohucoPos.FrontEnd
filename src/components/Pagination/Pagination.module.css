@@ -7,6 +7,35 @@
   background: rgba(255, 255, 255, 0.05);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0 0 1rem 1rem;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .pageInfo {
+    order: 2;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .buttons {
+    order: 1;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .button {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
 }
 
 .pageInfo {
