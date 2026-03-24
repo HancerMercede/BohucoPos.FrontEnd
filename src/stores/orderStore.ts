@@ -7,9 +7,7 @@ import { useNotificationStore } from './notificationStore';
 import { useCartStore } from './cartStore';
 import { useProductStore } from './productStore';
 import { ERROR_MESSAGES } from '../constants/messages';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
-const SIGNALR_URL = import.meta.env.VITE_SIGNALR_URL || 'https://localhost:7089/hubs/orders';
+import { API_URL, SIGNALR_URL } from '../config';
 
 const STATUS_MAP: Record<number, string> = {
   0: 'Pending',

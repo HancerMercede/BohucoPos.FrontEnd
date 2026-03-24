@@ -3,8 +3,7 @@ import type { MenuItem } from '../types';
 import { getAuthHeaders } from '../utils/api';
 import { useNotificationStore } from './notificationStore';
 import { ERROR_MESSAGES } from '../constants/messages';
-
-const API_URL = import.meta.env.VITE_API_URL || 'https://localhost:7089';
+import { API_URL } from '../config';
 
 interface ProductStore {
   products: MenuItem[];
