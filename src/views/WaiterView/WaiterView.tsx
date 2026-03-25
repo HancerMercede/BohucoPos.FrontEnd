@@ -66,6 +66,7 @@ export function WaiterView() {
   }, [category]);
 
   const total = useMemo(() => cart.reduce((s, c) => s + c.price * c.qty, 0), [cart]);
+  const cartQty = useMemo(() => cart.reduce((s, c) => s + c.qty, 0), [cart]);
 
   const handleSend = () => {
     submitOrder(waiterName);
@@ -295,8 +296,9 @@ export function WaiterView() {
       <button 
         className={styles.cartToggle}
         onClick={() => setIsCartOpen(!isCartOpen)}
+        style={{ display: cartQty > 0 ? 'flex' : 'none' }}
       >
-        🛒 {cart.length > 0 && <span className={styles.cartBadge}>{cart.length}</span>}
+        🛒 <span className={styles.cartBadge}>{cartQty}</span>
       </button>
     </div>
   );

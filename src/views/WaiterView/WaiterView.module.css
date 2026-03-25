@@ -684,7 +684,7 @@
     position: fixed;
     bottom: 24px;
     right: 24px;
-    background: #10B981;
+    background: #8B5CF6;
     color: white;
     border: none;
     border-radius: 50%;
@@ -692,7 +692,7 @@
     height: 60px;
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(16,185,129,0.4);
+    box-shadow: 0 4px 16px rgba(139,92,246,0.4);
     z-index: 201;
     align-items: center;
     justify-content: center;
