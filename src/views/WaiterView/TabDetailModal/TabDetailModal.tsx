@@ -64,7 +64,7 @@ function OrderBlock({ order, index }: { order: Order; index: number }) {
   )
 }
 
-export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill, onCloseTab }: TabDetailModalProps) {
+export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill: _onRequestBill, onCloseTab }: TabDetailModalProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [billRequested, setBillRequested] = useState(false)

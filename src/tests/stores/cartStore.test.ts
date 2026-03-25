@@ -12,8 +12,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -31,8 +31,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -50,8 +50,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -67,8 +67,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -85,8 +85,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -102,8 +102,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -119,8 +119,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -129,7 +129,7 @@ describe('cartStore', () => {
       name: 'Cerveza',
       price: 5.00,
       category: 'Bebidas',
-      destination: 'Bar',
+      dest: 'Bar',
       productType: 'Physical',
       emoji: '🍺'
     }
@@ -147,8 +147,8 @@ describe('cartStore', () => {
       id: 'p1',
       name: 'Hamburguesa',
       price: 15.50,
-      category: 'Comida',
-      destination: 'Kitchen',
+      category: 'Platos',
+      dest: 'Kitchen',
       productType: 'Physical',
       emoji: '🍔'
     }
@@ -161,7 +161,7 @@ describe('cartStore', () => {
 
   it('setCart replaces entire cart', () => {
     const cartItems = [
-      { id: 'p1', name: 'Item 1', price: 10, category: '', destination: 'Kitchen' as const, productType: 'Physical' as const, emoji: '', qty: 2, notes: '' }
+      { id: 'p1', name: 'Item 1', price: 10, category: 'Platos' as const, dest: 'Kitchen' as const, productType: 'Physical' as const, emoji: '', qty: 2, notes: '' }
     ]
 
     useCartStore.getState().setCart(cartItems)

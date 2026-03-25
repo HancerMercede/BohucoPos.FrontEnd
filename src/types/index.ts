@@ -76,6 +76,7 @@ export interface MenuItem {
   price: number
   dest: ItemDestination
   category: Exclude<MenuCategory, 'Todos'>
+  productType: 'Physical' | 'Service'
   emoji: string
 }
 
