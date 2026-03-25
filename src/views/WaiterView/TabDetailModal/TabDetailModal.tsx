@@ -219,6 +219,9 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
               ) : null}
             </div>
           </div>
+          <button className={styles.pdfFloatingClose} onClick={closePdf}>
+            Cerrar y Proceder al Pago
+          </button>
         </div>
       )}
     </div>

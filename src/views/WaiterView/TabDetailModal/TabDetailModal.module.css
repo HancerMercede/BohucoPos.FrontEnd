@@ -453,6 +453,18 @@
     height: 48px;
     font-size: 20px;
   }
+
+  .pdfOverlay {
+    touch-action: pan-y;
+  }
+
+  .pdfModal {
+    position: relative;
+  }
+
+  .pdfFloatingClose {
+    display: flex;
+  }
 }
 
 .pdfHeader {
@@ -485,6 +497,30 @@
 
 .pdfCloseBtn:hover {
   background: rgba(255,255,255,0.2);
+}
+
+.pdfFloatingClose {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #EF4444;
+  color: white;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(239,68,68,0.4);
+  z-index: 301;
+}
+
+@media (max-width: 500px) {
+  .pdfFloatingClose {
+    display: block;
+  }
 }
 
 .pdfContent {
