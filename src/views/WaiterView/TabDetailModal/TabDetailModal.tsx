@@ -102,9 +102,6 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
       URL.revokeObjectURL(pdfUrl)
       setPdfUrl(null)
     }
-    if (onRequestBill) {
-      await onRequestBill()
-    }
   }
 
   return (
