@@ -102,9 +102,6 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
       URL.revokeObjectURL(pdfUrl)
       setPdfUrl(null)
     }
-    if (onRequestBill) {
-      await onRequestBill()
-    }
   }
 
   return (
@@ -208,7 +205,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
       </div>
 
       {(pdfUrl || pdfLoading) && (
-        <div className={styles.pdfOverlay} onClick={closePdf}>
+        <div className={styles.pdfOverlay}>
           <div className={styles.pdfModal} onClick={e => e.stopPropagation()}>
             <div className={styles.pdfHeader}>
               <span className={styles.pdfTitle}>Cuenta - {tab.customerName}</span>
@@ -222,6 +219,9 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
               ) : null}
             </div>
           </div>
+          <button className={styles.pdfFloatingClose} onClick={closePdf}>
+            Cerrar y Proceder al Pago
+          </button>
         </div>
       )}
     </div>

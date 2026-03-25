@@ -47,6 +47,7 @@ export function WaiterView() {
 
   const [noteModal, setNoteModal] = useState<{ id: string; note: string } | null>(null);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const tabsByTable = useMemo(() => {
     const result: Record<string, Tab[]> = {};
@@ -65,6 +66,11 @@ export function WaiterView() {
   }, [category]);
 
   const total = useMemo(() => cart.reduce((s, c) => s + c.price * c.qty, 0), [cart]);
+  const cartQty = useMemo(() => cart.reduce((s, c) => s + c.qty, 0), [cart]);
+
+  useEffect(() => {
+    if (cart.length === 0) setIsCartOpen(false);
+  }, [cart.length]);
 
   const handleSend = () => {
     submitOrder(waiterName);
@@ -214,7 +220,7 @@ export function WaiterView() {
         </div>
       </div>
 
-      <div className={styles.cartPanel}>
+      <div className={`${styles.cartPanel} ${isCartOpen ? styles.open : ''}`}>
         <div className={styles.cartHeader}>
           <div className={styles.cartTitle}>Orden</div>
           <div className={styles.cartSubtitle}>{selectedTable?.name}</div>
@@ -290,6 +296,14 @@ export function WaiterView() {
           </div>
         </div>
       )}
+
+      <button 
+        className={styles.cartToggle}
+        onClick={() => setIsCartOpen(!isCartOpen)}
+        style={{ display: cartQty > 0 ? 'flex' : 'none' }}
+      >
+        🛒 <span className={styles.cartBadge}>{cartQty}</span>
+      </button>
     </div>
   );
 }
