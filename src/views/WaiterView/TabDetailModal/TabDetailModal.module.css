@@ -505,7 +505,7 @@
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: #EF4444;
+  background: linear-gradient(135deg, #3B82F6, #8B5CF6);
   color: white;
   border: none;
   border-radius: 24px;
@@ -513,7 +513,7 @@
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(239,68,68,0.4);
+  box-shadow: 0 4px 16px rgba(139,92,246,0.4);
   z-index: 301;
 }
 
