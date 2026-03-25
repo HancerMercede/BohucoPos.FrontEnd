@@ -205,7 +205,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill,
       </div>
 
       {(pdfUrl || pdfLoading) && (
-        <div className={styles.pdfOverlay} onClick={closePdf}>
+        <div className={styles.pdfOverlay}>
           <div className={styles.pdfModal} onClick={e => e.stopPropagation()}>
             <div className={styles.pdfHeader}>
               <span className={styles.pdfTitle}>Cuenta - {tab.customerName}</span>
