@@ -40,6 +40,7 @@ export function WaiterView() {
     closeTab,
     selectedTab,
     setSelectedTab,
+    fetchTabDetails,
   } = useOrderStore();
 
   const { user } = useAuthStore();
@@ -161,6 +162,7 @@ export function WaiterView() {
             }}
             onRequestBill={handleRequestBill}
             onCloseTab={handleCloseTab}
+            onRefreshTab={() => selectedTab && fetchTabDetails(selectedTab.id)}
           />
         )}
       </>

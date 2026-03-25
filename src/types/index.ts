@@ -145,6 +145,7 @@ export interface TabDetailModalProps {
   onAddOrder: () => void
   onRequestBill?: () => void
   onCloseTab?: (paymentMethod: PaymentMethod) => void
+  onRefreshTab?: () => void
 }
 
 export interface NoteModalProps {
