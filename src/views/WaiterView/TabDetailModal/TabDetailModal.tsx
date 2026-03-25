@@ -64,27 +64,34 @@ function OrderBlock({ order, index }: { order: Order; index: number }) {
   )
 }
 
-export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill: _onRequestBill, onCloseTab }: TabDetailModalProps) {
+export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill, onCloseTab, onRefreshTab }: TabDetailModalProps) {
+  const selectedTab = useOrderStore(s => s.selectedTab)
+  const tabData = selectedTab || tab
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [billRequested, setBillRequested] = useState(false)
   
-  const s = TAB_STATUS_COLORS[tab.status]
-  const subtotal = tab.orders.reduce(
+  const s = TAB_STATUS_COLORS[tabData.status]
+  const subtotal = tabData.orders.reduce(
     (sum, o) => sum + o.items.reduce((s, i) => s + (i.price || i.unitPrice || 0) * (i.qty || i.quantity || 0), 0), 0
   )
   const tax = subtotal * TAX_RATE
   const total = subtotal + tax
-  const isOpen = tab.status === 'OPEN' || tab.status === 'Open'
-  const isPending = tab.status === 'PENDING' || tab.status === 'Pending'
-
+  const isOpen = tabData.status === 'OPEN' || tabData.status === 'Open'
+  const isPending = tabData.status === 'PENDING' || tabData.status === 'Pending'
+  
   const handleRequestBill = async () => {
     if (billRequested) return
     
     setBillRequested(true)
     setPdfLoading(true)
+    
+    if (onRequestBill) {
+      await onRequestBill()
+    }
+    
     try {
-      const response = await fetch(`${API_URL}/api/tabs/${tab.id}/pdf`, { headers: getAuthHeaders() })
+      const response = await fetch(`${API_URL}/api/tabs/${tabData.id}/pdf`, { headers: getAuthHeaders() })
       if (response.ok) {
         const blob = await response.blob()
         const url = URL.createObjectURL(blob)
@@ -101,6 +108,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill:
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl)
       setPdfUrl(null)
+      if (onRefreshTab) onRefreshTab()
     }
   }
 
@@ -111,12 +119,12 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill:
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <div className={styles.avatar}>
-              {tab.customerName.charAt(0).toUpperCase()}
+              {tabData.customerName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h3 className={styles.title}>{tab.customerName}</h3>
+              <h3 className={styles.title}>{tabData.customerName}</h3>
               <p className={styles.subtitle}>
-                {table.name} · Abierta {tab.openedAt ? new Date(tab.openedAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''}
+                {table.name} · Abierta {tabData.openedAt ? new Date(tabData.openedAt).toLocaleTimeString('es-DO', { hour: '2-digit', minute: '2-digit' }) : ''}
               </p>
             </div>
           </div>
@@ -132,13 +140,13 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill:
         </div>
 
         <div className={styles.body}>
-          {tab.orders.length === 0 ? (
+          {tabData.orders.length === 0 ? (
             <div className={styles.empty}>
               <span>🧾</span>
               <p>Sin órdenes aún</p>
             </div>
           ) : (
-            tab.orders.map((order, i) => (
+            tabData.orders.map((order, i) => (
               <OrderBlock key={order.id} order={order} index={i} />
             ))
           )}
@@ -208,7 +216,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill:
         <div className={styles.pdfOverlay}>
           <div className={styles.pdfModal} onClick={e => e.stopPropagation()}>
             <div className={styles.pdfHeader}>
-              <span className={styles.pdfTitle}>Cuenta - {tab.customerName}</span>
+              <span className={styles.pdfTitle}>Cuenta - {tabData.customerName}</span>
               <button className={styles.pdfCloseBtn} onClick={closePdf}>✕</button>
             </div>
             <div className={styles.pdfContent}>

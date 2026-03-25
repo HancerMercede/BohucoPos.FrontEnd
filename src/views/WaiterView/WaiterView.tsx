@@ -40,6 +40,7 @@ export function WaiterView() {
     closeTab,
     selectedTab,
     setSelectedTab,
+    fetchTabDetails,
   } = useOrderStore();
 
   const { user } = useAuthStore();
@@ -161,6 +162,7 @@ export function WaiterView() {
             }}
             onRequestBill={handleRequestBill}
             onCloseTab={handleCloseTab}
+            onRefreshTab={() => selectedTab && fetchTabDetails(selectedTab.id)}
           />
         )}
       </>
@@ -300,7 +302,6 @@ export function WaiterView() {
       <button 
         className={styles.cartToggle}
         onClick={() => setIsCartOpen(!isCartOpen)}
-        style={{ display: cartQty > 0 ? 'flex' : 'none' }}
       >
         🛒 <span className={styles.cartBadge}>{cartQty}</span>
       </button>
