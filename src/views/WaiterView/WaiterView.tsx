@@ -68,6 +68,10 @@ export function WaiterView() {
   const total = useMemo(() => cart.reduce((s, c) => s + c.price * c.qty, 0), [cart]);
   const cartQty = useMemo(() => cart.reduce((s, c) => s + c.qty, 0), [cart]);
 
+  useEffect(() => {
+    if (cart.length === 0) setIsCartOpen(false);
+  }, [cart.length]);
+
   const handleSend = () => {
     submitOrder(waiterName);
   };
