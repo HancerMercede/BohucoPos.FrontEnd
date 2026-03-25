@@ -64,7 +64,7 @@ function OrderBlock({ order, index }: { order: Order; index: number }) {
   )
 }
 
-export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill: _onRequestBill, onCloseTab, onRefreshTab }: TabDetailModalProps) {
+export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill, onCloseTab }: TabDetailModalProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null)
   const [pdfLoading, setPdfLoading] = useState(false)
   const [billRequested, setBillRequested] = useState(false)
@@ -101,7 +101,6 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill:
     if (pdfUrl) {
       URL.revokeObjectURL(pdfUrl)
       setPdfUrl(null)
-      if (onRefreshTab) onRefreshTab()
     }
   }
 
@@ -206,7 +205,7 @@ export function TabDetailModal({ tab, table, onClose, onAddOrder, onRequestBill:
       </div>
 
       {(pdfUrl || pdfLoading) && (
-        <div className={styles.pdfOverlay} onClick={closePdf}>
+        <div className={styles.pdfOverlay}>
           <div className={styles.pdfModal} onClick={e => e.stopPropagation()}>
             <div className={styles.pdfHeader}>
               <span className={styles.pdfTitle}>Cuenta - {tab.customerName}</span>
