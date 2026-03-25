@@ -661,6 +661,29 @@
   color: rgba(255,255,255,0.45);
 }
 
+/* Mobile */
+@media (max-width: 480px) {
+  .successContainer {
+    height: 60vh;
+    gap: 16px;
+    padding: 16px;
+  }
+  
+  .successIcon {
+    width: 72px;
+    height: 72px;
+    font-size: 32px;
+  }
+
+  .successTitle {
+    font-size: 24px;
+  }
+
+  .successSubtitle {
+    font-size: 12px;
+  }
+}
+
 .cartToggle {
   display: none;
 }
