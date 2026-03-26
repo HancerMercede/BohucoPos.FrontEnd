@@ -117,6 +117,10 @@ export function LoginView() {
           </button>
         </p>
       </div>
+
+      <p className={styles.footer}>
+        © {new Date().getFullYear()} HM Software Solutions. All rights reserved.
+      </p>
     </div>
   );
 }
