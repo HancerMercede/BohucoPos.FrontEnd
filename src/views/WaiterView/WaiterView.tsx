@@ -8,6 +8,7 @@ import { TableSelector } from './TableSelector';
 import { OpenTabModal } from './OpenTabModal';
 import { TabsModal } from './TabsModal';
 import { TabDetailModal } from './TabDetailModal';
+import { modals } from '../../components/ModalProvider';
 import styles from './WaiterView.module.css';
 import type { MenuCategory, Tab, PaymentMethod } from '../../types';
 
@@ -46,7 +47,6 @@ export function WaiterView() {
   const { user } = useAuthStore();
   const waiterName = user?.fullName?.split(' ')[0] || 'Mesero';
 
-  const [noteModal, setNoteModal] = useState<{ id: string; note: string } | null>(null);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
@@ -251,7 +251,7 @@ export function WaiterView() {
                     <span className={styles.qtyValue}>{item.qty}</span>
                     <button className={styles.qtyBtn} onClick={() => updateCartQty(item.id, 1)}>+</button>
                   </div>
-                  <button className={styles.noteBtn} onClick={() => setNoteModal({ id: item.id, note: item.notes })}>
+                  <button className={styles.noteBtn} onClick={() => modals.openNote(item.id, item.notes || '', updateCartNote)}>
                     + nota
                   </button>
                 </div>
@@ -274,30 +274,6 @@ export function WaiterView() {
           </button>
         </div>
       </div>
-
-      {noteModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <div className={styles.modalTitle}>Agregar nota</div>
-            <textarea
-              className={styles.modalInput}
-              value={noteModal.note}
-              onChange={(e) => setNoteModal({ ...noteModal, note: e.target.value })}
-              placeholder="ej: sin cebolla, extra picante..."
-              autoFocus
-            />
-            <div className={styles.modalButtons}>
-              <button className={styles.modalCancel} onClick={() => setNoteModal(null)}>Cancelar</button>
-              <button 
-                className={styles.modalSave} 
-                onClick={() => { updateCartNote(noteModal.id, noteModal.note); setNoteModal(null); }}
-              >
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <button 
         className={styles.cartToggle}

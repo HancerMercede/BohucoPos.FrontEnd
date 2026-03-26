@@ -1,16 +1,13 @@
 import styles from './ConfirmModal.module.css';
 
 interface ConfirmModalProps {
-  isOpen: boolean;
   title: string;
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
 
-export function ConfirmModal({ isOpen, title, message, onConfirm, onCancel }: ConfirmModalProps) {
-  if (!isOpen) return null;
-
+export function ConfirmModal({ title, message, onConfirm, onCancel }: ConfirmModalProps) {
   return (
     <div className={styles.overlay} onClick={onCancel}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Background } from './components/Background';
 import { TopBar } from './components/TopBar';
 import { Toast } from './components/Toast/Toast';
+import { ModalProvider, ModalManager } from './components/ModalProvider';
 import { WaiterView } from './views/WaiterView';
 import { DisplayView } from './views/DisplayView';
 import { OverviewView } from './views/OverviewView';
@@ -35,15 +36,16 @@ function App() {
 
   if (!isAuthenticated) {
     return (
-      <>
+      <ModalProvider>
         <Background />
         <LoginView />
-      </>
+        <ModalManager />
+      </ModalProvider>
     );
   }
 
   return (
-    <>
+    <ModalProvider>
       <Background />
       <TopBar view={view} setView={setView} />
       <Toast />
@@ -57,7 +59,8 @@ function App() {
           {view === 'products' && <ProductsView />}
         </div>
       </div>
-    </>
+      <ModalManager />
+    </ModalProvider>
   );
 }
 
