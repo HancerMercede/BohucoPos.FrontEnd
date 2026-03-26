@@ -5,8 +5,8 @@ import { ERROR_MESSAGES } from '../../constants/messages';
 import { ProductSearch } from './ProductSearch';
 import { ProductList, type Product } from './ProductList';
 import { ProductModal, type ProductFormData } from './ProductModal';
-import { ConfirmModal } from './ConfirmModal';
 import { Pagination } from '../../components/Pagination';
+import { modals } from '../../components/ModalProvider';
 import { API_URL } from '../../config';
 import styles from './ProductsView.module.css';
 
@@ -20,10 +20,6 @@ export function ProductsView() {
   const [currentPage, setCurrentPage] = useState(1);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; productId: number | null }>({
-    isOpen: false,
-    productId: null,
-  });
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -95,29 +91,25 @@ export function ProductsView() {
   };
 
   const handleDeleteClick = (id: number) => {
-    setDeleteConfirm({ isOpen: true, productId: id });
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deleteConfirm.productId) return;
-    try {
-      const response = await fetch(`${API_URL}/api/products/${deleteConfirm.productId}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-      });
-      if (response.ok) {
-        showNotification('Producto eliminado', 'success');
-        fetchProducts();
-      }
-    } catch (error) {
-      showNotification('Error al eliminar producto', 'error');
-    } finally {
-      setDeleteConfirm({ isOpen: false, productId: null });
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteConfirm({ isOpen: false, productId: null });
+    modals.openConfirm(
+      'Eliminar Producto',
+      '¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.',
+      async () => {
+        try {
+          const response = await fetch(`${API_URL}/api/products/${id}`, {
+            method: 'DELETE',
+            headers: getAuthHeaders(),
+          });
+          if (response.ok) {
+            showNotification('Producto eliminado', 'success');
+            fetchProducts();
+          }
+        } catch (error) {
+          showNotification('Error al eliminar producto', 'error');
+        }
+      },
+      () => {}
+    );
   };
 
   const openNewModal = () => {
@@ -166,14 +158,6 @@ export function ProductsView() {
         isOpen={isModalOpen}
         onClose={closeModal}
         onSave={handleSave}
-      />
-
-      <ConfirmModal
-        isOpen={deleteConfirm.isOpen}
-        title="Eliminar Producto"
-        message="¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer."
-        onConfirm={handleDeleteConfirm}
-        onCancel={handleDeleteCancel}
       />
     </div>
   );
