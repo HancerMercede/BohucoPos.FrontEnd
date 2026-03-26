@@ -32,7 +32,7 @@ export function LoginView() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || (isRegister ? 'Registration failed' : 'Login failed'));
+        throw new Error(data.error || (isRegister ? 'Registration failed' : 'Login failed'));
       }
 
       const data = await response.json();
@@ -42,7 +42,7 @@ export function LoginView() {
         fullName: data.fullName,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Authentication failed');
+      setError(err instanceof Error ? err.message : 'Invalid username or password');
     } finally {
       setIsLoading(false);
     }
