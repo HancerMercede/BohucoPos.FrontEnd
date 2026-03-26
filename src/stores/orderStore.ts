@@ -292,6 +292,7 @@ export const useOrderStore = create<OrderStore>((set, get) => ({
         accessTokenFactory: () => token || '',
       })
       .withAutomaticReconnect()
+      .configureLogging(signalR.LogLevel.Warning)
       .build();
 
     connection.on('OrderCreated', (order: Order) => {
