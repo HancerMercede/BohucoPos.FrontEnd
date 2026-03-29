@@ -204,3 +204,50 @@ export interface AuthState {
   login: (token: string, user: User) => void;
   logout: () => void;
 }
+
+// ─── STORE TYPES ─────────────────────────────────────────────────
+
+export interface Notification {
+  message: string;
+  type: 'success' | 'error' | 'info';
+}
+
+export interface NotificationStore {
+  notification: Notification | null;
+  showNotification: (message: string, type: 'success' | 'error' | 'info') => void;
+  clearNotification: () => void;
+}
+
+export interface CartStore {
+  cart: CartItem[];
+  sent: boolean;
+  addToCart: (item: MenuItem) => void;
+  updateCartQty: (id: string, delta: number) => void;
+  updateCartNote: (id: string, notes: string) => void;
+  removeFromCart: (id: string) => void;
+  clearCart: () => void;
+  setCart: (cart: CartItem[]) => void;
+}
+
+export interface ProductStore {
+  products: MenuItem[];
+  isLoading: boolean;
+  fetchProducts: () => Promise<void>;
+}
+
+export interface TableStore {
+  tables: TableItem[];
+  selectedTable: TableItem | null;
+  waiterStep: WaiterStep;
+  category: MenuCategory;
+  tabs: Tab[];
+  selectedTab: Tab | null;
+  selectTable: (table: TableItem, tabs?: Tab[]) => void;
+  goToTabs: (table: TableItem) => void;
+  goToMenu: (table: TableItem) => void;
+  goBackToTables: () => void;
+  setCategory: (cat: MenuCategory) => void;
+  setSelectedTab: (tab: Tab | null) => void;
+  setTabs: (tabs: Tab[]) => void;
+  updateTableStatus: (tableName: string, status: 'free' | 'occupied') => void;
+}

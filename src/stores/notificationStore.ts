@@ -1,15 +1,5 @@
 import { create } from 'zustand';
-
-interface Notification {
-  message: string;
-  type: 'success' | 'error' | 'info';
-}
-
-interface NotificationStore {
-  notification: Notification | null;
-  showNotification: (message: string, type: 'success' | 'error' | 'info') => void;
-  clearNotification: () => void;
-}
+import type { NotificationStore } from '../types';
 
 export const useNotificationStore = create<NotificationStore>((set) => ({
   notification: null,
