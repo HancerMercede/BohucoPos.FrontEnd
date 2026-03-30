@@ -1,15 +1,6 @@
 import { create } from "zustand";
 import * as signalR from "@microsoft/signalr";
-import type {
-  TableItem,
-  Order,
-  MenuItem,
-  MenuCategory,
-  ItemDestination,
-  Tab,
-  PaymentMethod,
-  OrderStore,
-} from "../types";
+import type { TableItem, Order, Tab, OrderStore } from "../types";
 import { getAuthHeaders } from "../utils/api";
 import { useAuthStore } from "./authStore";
 import { useNotificationStore } from "./notificationStore";
