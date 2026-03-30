@@ -1,20 +1,21 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useOrderStore } from '../../stores/orderStore';
-import { useCartStore } from '../../stores/cartStore';
-import { useProductStore } from '../../stores/productStore';
-import { useAuthStore } from '../../stores/authStore';
-import { DestTag } from '../../components/DestTag';
-import { TableSelector } from './TableSelector';
-import { OpenTabModal } from './OpenTabModal';
-import { TabsModal } from './TabsModal';
-import { TabDetailModal } from './TabDetailModal';
-import { modals } from '../../components/ModalProvider';
-import styles from './WaiterView.module.css';
-import type { MenuCategory, Tab, PaymentMethod } from '../../types';
+import { useState, useMemo, useEffect } from "react";
+import { useOrderStore } from "../../stores/orderStore";
+import { useCartStore } from "../../stores/cartStore";
+import { useProductStore } from "../../stores/productStore";
+import { useAuthStore } from "../../stores/authStore";
+import { DestTag } from "../../components/DestTag";
+import { TableSelector } from "./TableSelector";
+import { OpenTabModal } from "./OpenTabModal";
+import { TabsModal } from "./TabsModal";
+import { TabDetailModal } from "./TabDetailModal";
+import { modals } from "../../components/ModalProvider";
+import styles from "./WaiterView.module.css";
+import type { MenuCategory, Tab, PaymentMethod } from "../../types";
+import { SuccessScreen } from "../../components/SuccessScreen";
 
-const categories: MenuCategory[] = ['Todos', 'Platos', 'Entradas', 'Bebidas'];
+const categories: MenuCategory[] = ["Todos", "Platos", "Entradas", "Bebidas"];
 
-type ModalType = 'openTab' | 'tabsList' | 'tabDetail' | null;
+type ModalType = "openTab" | "tabsList" | "tabDetail" | null;
 
 export function WaiterView() {
   const cart = useCartStore((s) => s.cart);
@@ -45,15 +46,17 @@ export function WaiterView() {
   } = useOrderStore();
 
   const { user } = useAuthStore();
-  const waiterName = user?.fullName?.split(' ')[0] || 'Mesero';
+  const waiterName = user?.fullName?.split(" ")[0] || "Mesero";
 
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   const tabsByTable = useMemo(() => {
     const result: Record<string, Tab[]> = {};
-    tabs.forEach(tab => {
-      const tableId = tables.find(t => t.name === tab.location)?.id;
+
+    tabs.forEach((tab) => {
+      const tableId = tables.find((t) => t.name === tab.location)?.id;
+
       if (tableId) {
         if (!result[tableId]) result[tableId] = [];
         result[tableId].push(tab);
@@ -63,10 +66,15 @@ export function WaiterView() {
   }, [tabs, tables]);
 
   const filteredItems = useMemo(() => {
-    return category === 'Todos' ? products : products.filter(m => m.category === category);
+    return category === "Todos"
+      ? products
+      : products.filter((m) => m.category === category);
   }, [category]);
 
-  const total = useMemo(() => cart.reduce((s, c) => s + c.price * c.qty, 0), [cart]);
+  const total = useMemo(
+    () => cart.reduce((s, c) => s + c.price * c.qty, 0),
+    [cart],
+  );
   const cartQty = useMemo(() => cart.reduce((s, c) => s + c.qty, 0), [cart]);
 
   useEffect(() => {
@@ -79,7 +87,12 @@ export function WaiterView() {
 
   const handleOpenTab = async (customerName: string) => {
     if (selectedTable) {
-      await openTab(selectedTable.name, customerName || 'Cliente', waiterName, waiterName);
+      await openTab(
+        selectedTable.name,
+        customerName || "Cliente",
+        waiterName,
+        waiterName,
+      );
       setActiveModal(null);
       goToMenu(selectedTable);
     }
@@ -99,20 +112,14 @@ export function WaiterView() {
   };
 
   useEffect(() => {
-    fetchTabsByLocation('');
+    fetchTabsByLocation("");
   }, [fetchTabsByLocation]);
 
   if (sent) {
-    return (
-      <div className={styles.successContainer}>
-        <div className={styles.successIcon}>✓</div>
-        <div className={styles.successTitle}>¡Orden Enviada!</div>
-        <div className={styles.successSubtitle}>Notificando cocina y barra en tiempo real...</div>
-      </div>
-    );
+    return <SuccessScreen />;
   }
 
-  if (waiterStep === 'tables') {
+  if (waiterStep === "tables") {
     return (
       <>
         <TableSelector
@@ -120,15 +127,15 @@ export function WaiterView() {
           tabsByTable={tabsByTable}
           onSelectFree={(table) => {
             selectTable(table);
-            setActiveModal('openTab');
+            setActiveModal("openTab");
           }}
           onSelectOccupied={(table) => {
             selectTable(table);
-            setActiveModal('tabsList');
+            setActiveModal("tabsList");
           }}
         />
 
-        {activeModal === 'openTab' && selectedTable && (
+        {activeModal === "openTab" && selectedTable && (
           <OpenTabModal
             table={selectedTable}
             onConfirm={handleOpenTab}
@@ -136,24 +143,24 @@ export function WaiterView() {
           />
         )}
 
-        {activeModal === 'tabsList' && selectedTable && (
+        {activeModal === "tabsList" && selectedTable && (
           <TabsModal
             table={selectedTable}
-            tabs={tabs.filter(t => t.location === selectedTable.name)}
+            tabs={tabs.filter((t) => t.location === selectedTable.name)}
             onViewTab={(tab) => {
               setSelectedTab(tab);
-              setActiveModal('tabDetail');
+              setActiveModal("tabDetail");
             }}
-            onNewTab={() => setActiveModal('openTab')}
+            onNewTab={() => setActiveModal("openTab")}
             onClose={() => setActiveModal(null)}
           />
         )}
 
-        {activeModal === 'tabDetail' && selectedTab && selectedTable && (
+        {activeModal === "tabDetail" && selectedTab && selectedTable && (
           <TabDetailModal
             tab={selectedTab}
             table={selectedTable}
-            onClose={() => setActiveModal('tabsList')}
+            onClose={() => setActiveModal("tabsList")}
             onAddOrder={() => {
               if (selectedTable) {
                 goToMenu(selectedTable);
@@ -178,15 +185,15 @@ export function WaiterView() {
           </button>
           <h2 className={styles.menuTitle}>
             {selectedTable?.name}
-            {selectedTab ? ` — ${selectedTab.customerName}` : ' — Nueva Orden'}
+            {selectedTab ? ` — ${selectedTab.customerName}` : " — Nueva Orden"}
           </h2>
         </div>
-        
+
         <div className={styles.categories}>
-          {categories.map(c => (
+          {categories.map((c) => (
             <button
               key={c}
-              className={`pill ${category === c ? 'on' : ''}`}
+              className={`pill ${category === c ? "on" : ""}`}
               onClick={() => setCategory(c)}
             >
               {c}
@@ -196,18 +203,25 @@ export function WaiterView() {
 
         <div className={styles.productsGrid}>
           {filteredItems.map((item, i) => {
-            const inCart = cart.find(c => c.id === item.id);
+            const inCart = cart.find((c) => c.id === item.id);
             return (
               <div
                 key={item.id}
-                className={`mi ${inCart ? 'sel' : ''}`}
-                style={{ animationDelay: `${i * 0.04}s` } as React.CSSProperties}
+                className={`mi ${inCart ? "sel" : ""}`}
+                style={
+                  { animationDelay: `${i * 0.04}s` } as React.CSSProperties
+                }
                 onClick={() => addToCart(item)}
               >
                 <div className={styles.productEmoji}>{item.emoji}</div>
                 <div className={styles.productName}>{item.name}</div>
-                <div className={styles.productRow} style={{ marginBottom: inCart ? 8 : 0 }}>
-                  <span className={styles.productPrice}>${item.price.toFixed(2)}</span>
+                <div
+                  className={styles.productRow}
+                  style={{ marginBottom: inCart ? 8 : 0 }}
+                >
+                  <span className={styles.productPrice}>
+                    ${item.price.toFixed(2)}
+                  </span>
                   <DestTag dest={item.dest} />
                 </div>
                 {inCart && (
@@ -222,12 +236,12 @@ export function WaiterView() {
         </div>
       </div>
 
-      <div className={`${styles.cartPanel} ${isCartOpen ? styles.open : ''}`}>
+      <div className={`${styles.cartPanel} ${isCartOpen ? styles.open : ""}`}>
         <div className={styles.cartHeader}>
           <div className={styles.cartTitle}>Orden</div>
           <div className={styles.cartSubtitle}>{selectedTable?.name}</div>
         </div>
-        
+
         <div className={styles.cartBody}>
           {cart.length === 0 ? (
             <div className={styles.cartEmpty}>
@@ -235,23 +249,44 @@ export function WaiterView() {
               Agrega productos al menú
             </div>
           ) : (
-            cart.map(item => (
+            cart.map((item) => (
               <div key={item.id} className={styles.cartItem}>
                 <div className={styles.cartItemRow}>
                   <div className={styles.cartItemInfo}>
                     <div className={styles.cartItemName}>{item.name}</div>
                     <DestTag dest={item.dest} />
-                    {item.notes && <div className={styles.cartItemNotes}>📝 {item.notes}</div>}
+                    {item.notes && (
+                      <div className={styles.cartItemNotes}>
+                        📝 {item.notes}
+                      </div>
+                    )}
                   </div>
-                  <span className={styles.cartItemTotal}>${(item.price * item.qty).toFixed(2)}</span>
+                  <span className={styles.cartItemTotal}>
+                    ${(item.price * item.qty).toFixed(2)}
+                  </span>
                 </div>
                 <div className={styles.cartItemActions}>
                   <div className={styles.qtyControls}>
-                    <button className={styles.qtyBtn} onClick={() => updateCartQty(item.id, -1)}>−</button>
+                    <button
+                      className={styles.qtyBtn}
+                      onClick={() => updateCartQty(item.id, -1)}
+                    >
+                      −
+                    </button>
                     <span className={styles.qtyValue}>{item.qty}</span>
-                    <button className={styles.qtyBtn} onClick={() => updateCartQty(item.id, 1)}>+</button>
+                    <button
+                      className={styles.qtyBtn}
+                      onClick={() => updateCartQty(item.id, 1)}
+                    >
+                      +
+                    </button>
                   </div>
-                  <button className={styles.noteBtn} onClick={() => modals.openNote(item.id, item.notes || '', updateCartNote)}>
+                  <button
+                    className={styles.noteBtn}
+                    onClick={() =>
+                      modals.openNote(item.id, item.notes || "", updateCartNote)
+                    }
+                  >
                     + nota
                   </button>
                 </div>
@@ -265,17 +300,17 @@ export function WaiterView() {
             <span className={styles.cartTotalLabel}>Total</span>
             <span className={styles.cartTotalAmount}>${total.toFixed(2)}</span>
           </div>
-          <button 
+          <button
             className={styles.sendBtn}
             onClick={handleSend}
             disabled={cart.length === 0 || isLoading}
           >
-            {isLoading ? 'Enviando...' : 'Enviar Orden →'}
+            {isLoading ? "Enviando..." : "Enviar Orden →"}
           </button>
         </div>
       </div>
 
-      <button 
+      <button
         className={styles.cartToggle}
         onClick={() => setIsCartOpen(!isCartOpen)}
       >

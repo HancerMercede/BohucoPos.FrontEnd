@@ -190,20 +190,7 @@ export interface DisplayViewProps {
   dest: ItemDestination;
 }
 
-export interface User {
-  username: string;
-  role: string;
-  fullName: string;
-}
 
-export interface AuthState {
-  token: string | null;
-  user: User | null;
-  isAuthenticated: boolean;
-  defaultView: ViewId;
-  login: (token: string, user: User) => void;
-  logout: () => void;
-}
 
 // ─── STORE TYPES ─────────────────────────────────────────────────
 
@@ -250,4 +237,59 @@ export interface TableStore {
   setSelectedTab: (tab: Tab | null) => void;
   setTabs: (tabs: Tab[]) => void;
   updateTableStatus: (tableName: string, status: 'free' | 'occupied') => void;
+}
+
+export interface User {
+  username: string;
+  role: string;
+  fullName: string;
+}
+
+export interface AuthState {
+  token: string | null;
+  user: User | null;
+  isAuthenticated: boolean;
+  defaultView: ViewId;
+  login: (token: string, user: User) => void;
+  logout: () => void;
+}
+
+export interface OrderStore {
+  tables: TableItem[];
+  orders: Order[];
+  selectedTable: TableItem | null;
+  waiterStep: 'tables' | 'menu' | 'tabs';
+  category: MenuCategory;
+  sent: boolean;
+  isLoading: boolean;
+  
+  tabs: Tab[];
+  selectedTab: Tab | null;
+  
+  selectTable: (table: TableItem) => void;
+  addToCart: (item: MenuItem) => void;
+  updateCartQty: (id: string, delta: number) => void;
+  updateCartNote: (id: string, notes: string) => void;
+  removeFromCart: (id: string) => void;
+  clearCart: () => void;
+  setCategory: (cat: MenuCategory) => void;
+  submitOrder: (waiterName: string) => Promise<void>;
+  fetchPendingOrders: (dest: ItemDestination, clearFirst?: boolean) => Promise<void>;
+  updateOrderItemStatus: (orderId: string, itemId: number, status: string) => Promise<void>;
+  clearOrders: () => void;
+  loadSignalR: () => void;
+  fetchProducts: () => Promise<void>;
+  
+  fetchTabsByLocation: (location: string) => Promise<void>;
+  fetchTabDetails: (tabId: number) => Promise<void>;
+  openTab: (location: string, customerName: string, waiterId: string, waiterName: string) => Promise<number>;
+  requestBill: (tabId: number) => Promise<void>;
+  closeTab: (tabId: number, paymentMethod: PaymentMethod, directClose?: boolean) => Promise<void>;
+  cancelTab: (tabId: number, reason?: string) => Promise<void>;
+  fetchBillPdf: (tabId: number) => Promise<string>;
+  cancelItem: (itemId: number, reason?: string) => Promise<void>;
+  setSelectedTab: (tab: Tab | null) => void;
+  goToTabs: (table: TableItem) => void;
+  goToMenu: (table: TableItem) => void;
+  goBackToTables: () => void;
 }
