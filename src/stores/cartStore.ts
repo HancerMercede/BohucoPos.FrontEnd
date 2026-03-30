@@ -1,17 +1,5 @@
 import { create } from 'zustand';
-import type { CartItem, MenuItem } from '../types';
-
-interface CartStore {
-  cart: CartItem[];
-  sent: boolean;
-  
-  addToCart: (item: MenuItem) => void;
-  updateCartQty: (id: string, delta: number) => void;
-  updateCartNote: (id: string, notes: string) => void;
-  removeFromCart: (id: string) => void;
-  clearCart: () => void;
-  setCart: (cart: CartItem[]) => void;
-}
+import type { CartItem, CartStore } from '../types';
 
 export const useCartStore = create<CartStore>((set, get) => ({
   cart: [],

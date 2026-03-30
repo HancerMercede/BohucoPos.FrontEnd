@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { TableItem, Tab, MenuCategory } from '../types';
+import type { TableItem, TableStore } from '../types';
 import { useCartStore } from './cartStore';
 
 const defaultTables: TableItem[] = [
@@ -14,24 +14,6 @@ const defaultTables: TableItem[] = [
   { id: 'b1', name: 'Barra 1', status: 'free', type: 'bar' },
   { id: 'b2', name: 'Barra 2', status: 'free', type: 'bar' },
 ];
-
-interface TableStore {
-  tables: TableItem[];
-  selectedTable: TableItem | null;
-  waiterStep: 'tables' | 'menu' | 'tabs';
-  category: MenuCategory;
-  tabs: Tab[];
-  selectedTab: Tab | null;
-  
-  selectTable: (table: TableItem, tabs?: Tab[]) => void;
-  goToTabs: (table: TableItem) => void;
-  goToMenu: (table: TableItem) => void;
-  goBackToTables: () => void;
-  setCategory: (cat: MenuCategory) => void;
-  setSelectedTab: (tab: Tab | null) => void;
-  setTabs: (tabs: Tab[]) => void;
-  updateTableStatus: (tableName: string, status: 'free' | 'occupied') => void;
-}
 
 export const useTableStore = create<TableStore>((set) => ({
   tables: defaultTables,

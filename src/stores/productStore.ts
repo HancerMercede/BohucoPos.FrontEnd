@@ -1,15 +1,9 @@
 import { create } from 'zustand';
-import type { MenuItem } from '../types';
+import type { ProductStore } from '../types';
 import { getAuthHeaders } from '../utils/api';
 import { useNotificationStore } from './notificationStore';
 import { ERROR_MESSAGES } from '../constants/messages';
 import { API_URL } from '../config';
-
-interface ProductStore {
-  products: MenuItem[];
-  isLoading: boolean;
-  fetchProducts: () => Promise<void>;
-}
 
 export const useProductStore = create<ProductStore>((set) => ({
   products: [],
